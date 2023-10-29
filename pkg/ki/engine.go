@@ -7,6 +7,10 @@ import (
 	"github.com/neonnetwork/ki/pkg/structure"
 )
 
+const (
+	EngineWindowUnit = 65536
+)
+
 type Engine struct {
 	windows *structure.BinaryTreeNode[Window]
 }
@@ -14,7 +18,7 @@ type Engine struct {
 func (engine *Engine) Init() *Engine {
 	engine.windows = structure.NewBinaryTreeNode[Window](objects.Init[RootWindow](&RootWindow{
 		position: structure.NewVector2[int32](0, 0),
-		size:     structure.NewVector2[int32](1280, 720),
+		size:     structure.NewVector2[int32](EngineWindowUnit, EngineWindowUnit),
 	}))
 
 	return engine
@@ -55,6 +59,12 @@ func (engine *Engine) Wait() {
 
 func (engine *Engine) Running() bool {
 	return !rl.WindowShouldClose()
+}
+
+func (engine *Engine) Screen() structure.Vector2[int32] {
+	return structure.NewVector2[int32](
+		int32(rl.GetRenderWidth()),
+		int32(rl.GetRenderHeight()))
 }
 
 func (engine *Engine) Cursor() structure.Vector2[int32] {
@@ -128,7 +138,7 @@ func (engine *Engine) RenderWindows() (err error) {
 }
 
 func (engine *Engine) RenderWindow(path []int, window *structure.BinaryTreeNode[Window]) (err error) {
-	err = window.Value().Render(engine.Cursor())
+	err = window.Value().Render(engine.Screen(), engine.Cursor())
 	if err != nil {
 		return
 	}

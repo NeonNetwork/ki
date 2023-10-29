@@ -27,3 +27,11 @@ func Div[T Number](x T, y T) T {
 
 	return x / y
 }
+
+func ConvertNumberInt32toFloat64(v int32) float64 {
+	return float64(v)
+}
+
+func ConvertNumberFloat64toInt32(v float64) int32 {
+	return int32(v)
+}

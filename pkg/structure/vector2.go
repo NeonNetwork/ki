@@ -2,6 +2,7 @@ package structure
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"golang.org/x/exp/rand"
 )
 
 type Vector2[T Number] struct {
@@ -14,6 +15,20 @@ func NewVector2[T Number](x T, y T) Vector2[T] {
 		x: x,
 		y: y,
 	}
+}
+
+func MapVector2[T Number, U Number](vector Vector2[T], fn func(T) U) Vector2[U] {
+	return NewVector2[U](
+		fn(vector.X()),
+		fn(vector.Y()))
+}
+
+func NewVector2Random[T Number](n int) Vector2[T] {
+	return MapVector2[byte, T](
+		NewVector2[byte](0, 0),
+		func(v byte) T {
+			return T(rand.Intn(n))
+		})
 }
 
 func (vector Vector2[T]) X() T {

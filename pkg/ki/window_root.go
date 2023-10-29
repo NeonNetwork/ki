@@ -9,6 +9,7 @@ type RootWindow struct {
 	id       uuid.UUID
 	position structure.Vector2[int32]
 	size     structure.Vector2[int32]
+	selected bool
 }
 
 func (window *RootWindow) Id() uuid.UUID {
@@ -37,13 +38,22 @@ func (window *RootWindow) SetSize(value structure.Vector2[int32]) {
 	window.size = value
 }
 
+func (window *RootWindow) Selected() bool {
+	return window.selected
+}
+
+func (window *RootWindow) SetSelected(value bool) {
+	window.selected = value
+}
+
+
 func (window *RootWindow) Init() *RootWindow {
 	window.id = uuid.New()
 
 	return window
 }
 
-func (window *RootWindow) Render(cursor structure.Vector2[int32]) (err error) {
+func (window *RootWindow) Render(screen structure.Vector2[int32], cursor structure.Vector2[int32]) (err error) {
 	return
 }
 

@@ -4,13 +4,17 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/google/uuid"
 	"github.com/neonnetwork/ki/pkg/structure"
-	"image/color"
+	"os"
 )
 
 type WindowImage struct {
 	id       uuid.UUID
 	position structure.Vector2[int32]
 	size     structure.Vector2[int32]
+	selected bool
+	color    structure.Vector3[uint8]
+
+	texture rl.Texture2D
 }
 
 func (window *WindowImage) Id() uuid.UUID {
@@ -31,10 +35,8 @@ func (window *WindowImage) Box() structure.Box[int32] {
 		window.Size())
 }
 
-func (window *WindowImage) Color() color.RGBA {
-	v := byte(window.position.X())
-
-	return color.RGBA{v, v, v, 255}
+func (window *WindowImage) Color() structure.Vector3[uint8] {
+	return window.color
 }
 
 func (window *WindowImage) SetPosition(value structure.Vector2[int32]) {
@@ -45,24 +47,53 @@ func (window *WindowImage) SetSize(value structure.Vector2[int32]) {
 	window.size = value
 }
 
+func (window *WindowImage) Selected() bool {
+	return window.selected
+}
+
+func (window *WindowImage) SetSelected(value bool) {
+	window.selected = value
+}
+
 func (window *WindowImage) Init() *WindowImage {
 	window.id = uuid.New()
+
+	window.color = structure.NewVector3Random[byte](256)
+
+	window.texture = rl.LoadTexture(os.Getenv("TEXTURE"))
 
 	return window
 }
 
-func (window *WindowImage) Render(cursor structure.Vector2[int32]) (err error) {
-	c := window.Color()
+func (window *WindowImage) Render(screen structure.Vector2[int32], cursor structure.Vector2[int32]) (err error) {
+	position := structure.MapVector2[float64, int32](
+		structure.MapVector2[int32, float64](window.Position(), structure.ConvertNumberInt32toFloat64).
+			Div(structure.NewVector2[float64](float64(EngineWindowUnit), float64(EngineWindowUnit))).
+			Mul(structure.MapVector2[int32, float64](screen, structure.ConvertNumberInt32toFloat64)),
+			structure.ConvertNumberFloat64toInt32)
 
-	if window.Box().CollisionPoint(cursor) {
+	size := structure.MapVector2[float64, int32](
+		structure.MapVector2[int32, float64](window.Size(), structure.ConvertNumberInt32toFloat64).
+			Div(structure.NewVector2[float64](float64(EngineWindowUnit), float64(EngineWindowUnit))).
+			Mul(structure.MapVector2[int32, float64](screen, structure.ConvertNumberInt32toFloat64)),
+			structure.ConvertNumberFloat64toInt32)
+
+	c := window.Color().ToColor()
+	if structure.NewBox(position, size).CollisionPoint(cursor) {
 		c = rl.Red
 	}
 
-	rl.DrawRectangle(
-		window.Position().X(),
-		window.Position().Y(),
-		window.Size().X(),
-		window.Size().Y(),
+//	rl.DrawRectangle(
+//		position.X(),
+//		position.Y(),
+//		size.X(),
+//		size.Y(),
+//		c)
+
+	rl.DrawTextureRec(
+		window.texture,
+		rl.NewRectangle(0, 0, float32(size.X()), float32(size.Y())),
+		position.ToRaylib(),
 		c)
 
 	return
