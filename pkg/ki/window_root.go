@@ -23,6 +23,12 @@ func (window *RootWindow) Size() structure.Vector2[int32] {
 	return window.size
 }
 
+func (window *RootWindow) Box() structure.Box[int32] {
+	return structure.NewBox[int32](
+		window.Position(),
+		window.Size())
+}
+
 func (window *RootWindow) SetPosition(value structure.Vector2[int32]) {
 	window.position = value
 }
@@ -37,7 +43,7 @@ func (window *RootWindow) Init() *RootWindow {
 	return window
 }
 
-func (window *RootWindow) Render() (err error) {
+func (window *RootWindow) Render(cursor structure.Vector2[int32]) (err error) {
 	return
 }
 

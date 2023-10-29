@@ -5,7 +5,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/neonnetwork/ki/pkg/structure"
 	"image/color"
-	"log"
 )
 
 type WindowImage struct {
@@ -24,6 +23,12 @@ func (window *WindowImage) Position() structure.Vector2[int32] {
 
 func (window *WindowImage) Size() structure.Vector2[int32] {
 	return window.size
+}
+
+func (window *WindowImage) Box() structure.Box[int32] {
+	return structure.NewBox[int32](
+		window.Position(),
+		window.Size())
 }
 
 func (window *WindowImage) Color() color.RGBA {
@@ -46,15 +51,19 @@ func (window *WindowImage) Init() *WindowImage {
 	return window
 }
 
-func (window *WindowImage) Render() (err error) {
+func (window *WindowImage) Render(cursor structure.Vector2[int32]) (err error) {
+	c := window.Color()
+
+	if window.Box().CollisionPoint(cursor) {
+		c = rl.Red
+	}
+
 	rl.DrawRectangle(
 		window.Position().X(),
 		window.Position().Y(),
 		window.Size().X(),
 		window.Size().Y(),
-		window.Color())
-
-	log.Println("window", window.Id().String(), window.Position(), window.Size())
+		c)
 
 	return
 }
@@ -62,6 +71,8 @@ func (window *WindowImage) Render() (err error) {
 func (window *WindowImage) Split() (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
 	size := window.size.Copy()
 	cut := size.Div(structure.NewVector2[int32](2, 1))
+
+	window.size = cut
 
 	result = structure.NewPair(
 		window.Position().Add(cut.Mul(structure.NewVector2[int32](1, 0))),

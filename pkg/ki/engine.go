@@ -21,7 +21,6 @@ func (engine *Engine) Init() *Engine {
 }
 
 func (engine *Engine) Start() (err error) {
-	//	rl.SetConfigFlags(rl.FlagVsyncHint)
 	rl.SetConfigFlags(rl.FlagWindowResizable)
 
 	rl.SetTargetFPS(360)
@@ -56,6 +55,12 @@ func (engine *Engine) Wait() {
 
 func (engine *Engine) Running() bool {
 	return !rl.WindowShouldClose()
+}
+
+func (engine *Engine) Cursor() structure.Vector2[int32] {
+	return structure.NewVector2[int32](
+		rl.GetMouseX(),
+		rl.GetMouseY())
 }
 
 func (engine *Engine) HandleInputs() (err error) {
@@ -123,7 +128,7 @@ func (engine *Engine) RenderWindows() (err error) {
 }
 
 func (engine *Engine) RenderWindow(path []int, window *structure.BinaryTreeNode[Window]) (err error) {
-	err = window.Value().Render()
+	err = window.Value().Render(engine.Cursor())
 	if err != nil {
 		return
 	}
