@@ -9,6 +9,7 @@ type RootWindow struct {
 	id       uuid.UUID
 	position structure.Vector2[int32]
 	size     structure.Vector2[int32]
+	axis     WindowSplitAxis
 	selected bool
 }
 
@@ -57,7 +58,7 @@ func (window *RootWindow) Render(screen structure.Vector2[int32], cursor structu
 	return
 }
 
-func (window *RootWindow) Split() (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
+func (window *RootWindow) Split(direction structure.BinaryTreeDirection) (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
 	size := window.size.Copy()
 	cut := size.Div(structure.NewVector2[int32](2, 1))
 
@@ -66,4 +67,8 @@ func (window *RootWindow) Split() (result structure.Pair[structure.Vector2[int32
 		cut)
 
 	return
+}
+
+func (window *RootWindow) SplitAxis() WindowSplitAxis {
+	return window.axis
 }

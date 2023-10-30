@@ -11,6 +11,7 @@ type WindowImage struct {
 	id       uuid.UUID
 	position structure.Vector2[int32]
 	size     structure.Vector2[int32]
+	axis     WindowSplitAxis
 	selected bool
 	color    structure.Vector3[uint8]
 
@@ -65,30 +66,34 @@ func (window *WindowImage) Init() *WindowImage {
 	return window
 }
 
-func (window *WindowImage) Render(screen structure.Vector2[int32], cursor structure.Vector2[int32]) (err error) {
-	position := structure.MapVector2[float64, int32](
+func (window *WindowImage) ScaledPosition(screen structure.Vector2[int32]) structure.Vector2[int32] {
+	return structure.MapVector2[float64, int32](
 		structure.MapVector2[int32, float64](window.Position(), structure.ConvertNumberInt32toFloat64).
 			Div(structure.NewVector2[float64](float64(EngineWindowUnit), float64(EngineWindowUnit))).
 			Mul(structure.MapVector2[int32, float64](screen, structure.ConvertNumberInt32toFloat64)),
 			structure.ConvertNumberFloat64toInt32)
+}
 
-	size := structure.MapVector2[float64, int32](
+func (window *WindowImage) ScaledSize(screen structure.Vector2[int32]) structure.Vector2[int32] {
+	return structure.MapVector2[float64, int32](
 		structure.MapVector2[int32, float64](window.Size(), structure.ConvertNumberInt32toFloat64).
 			Div(structure.NewVector2[float64](float64(EngineWindowUnit), float64(EngineWindowUnit))).
 			Mul(structure.MapVector2[int32, float64](screen, structure.ConvertNumberInt32toFloat64)),
 			structure.ConvertNumberFloat64toInt32)
+}
+
+func (window *WindowImage) ScaledBox(screen structure.Vector2[int32]) structure.Box[int32] {
+	return structure.NewBox(window.ScaledPosition(screen), window.ScaledSize(screen))
+}
+
+func (window *WindowImage) Render(screen structure.Vector2[int32], cursor structure.Vector2[int32]) (err error) {
+	position := window.ScaledPosition(screen)
+	size := window.ScaledSize(screen)
 
 	c := window.Color().ToColor()
-	if structure.NewBox(position, size).CollisionPoint(cursor) {
+	if window.ScaledBox(screen).CollisionPoint(cursor) {
 		c = rl.Red
 	}
-
-//	rl.DrawRectangle(
-//		position.X(),
-//		position.Y(),
-//		size.X(),
-//		size.Y(),
-//		c)
 
 	rl.DrawTextureRec(
 		window.texture,
@@ -96,18 +101,47 @@ func (window *WindowImage) Render(screen structure.Vector2[int32], cursor struct
 		position.ToRaylib(),
 		c)
 
+	if window.Selected() {
+		rl.DrawRectangleLinesEx(
+			window.ScaledBox(screen).ToRaylibRectangle(),
+			2,
+			rl.RayWhite)
+	}
+
 	return
 }
 
-func (window *WindowImage) Split() (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
-	size := window.size.Copy()
-	cut := size.Div(structure.NewVector2[int32](2, 1))
+func (window *WindowImage) Split(direction structure.BinaryTreeDirection) (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
+	var (
+		zero structure.Vector2[int32]
+		size structure.Vector2[int32]
+		diff structure.Vector2[int32]
+	)
 
-	window.size = cut
+	zero = structure.NewVector2[int32](0, 0)           // [0    , 0]
+	size = window.size.Copy()                               // [W    , H]
+	size = size.Div(structure.NewVector2[int32](2, 1)) // [W / 2, H]
+	diff = size.Mul(structure.NewVector2[int32](1, 0)) // [W / 2, 0]
 
-	result = structure.NewPair(
-		window.Position().Add(cut.Mul(structure.NewVector2[int32](1, 0))),
-		cut)
+	if direction == structure.BinaryTreeLeft {
+		result = structure.NewPair(
+			window.Position().Add(zero),
+			size)
+
+		window.size = size
+		window.position = window.position.Add(diff)
+	} else {
+		result = structure.NewPair(
+			window.Position().Add(diff),
+			size)
+
+		window.size = size
+		window.position = window.position.Add(zero)
+	}
 
 	return
+}
+
+func (window *RootWindow) SplitAxis() WindowSplitAxis {
+	return window.axis
 }

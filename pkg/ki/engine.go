@@ -12,7 +12,8 @@ const (
 )
 
 type Engine struct {
-	windows *structure.BinaryTreeNode[Window]
+	windows  *structure.BinaryTreeNode[Window]
+	selected *structure.BinaryTreeNode[Window]
 }
 
 func (engine *Engine) Init() *Engine {
@@ -20,6 +21,8 @@ func (engine *Engine) Init() *Engine {
 		position: structure.NewVector2[int32](0, 0),
 		size:     structure.NewVector2[int32](EngineWindowUnit, EngineWindowUnit),
 	}))
+
+	engine.selected = engine.windows
 
 	return engine
 }
@@ -78,37 +81,25 @@ func (engine *Engine) HandleInputs() (err error) {
 		rl.ToggleFullscreen()
 	}
 
-	if rl.IsKeyPressed(rl.KeyX) {
-		ptr := engine.windows
-		for {
-			f := false
+	if rl.IsKeyPressed(rl.KeyH) {
+		engine.selected = engine.WindowChildAdd(engine.selected, objects.Init[WindowImage](&WindowImage{}), structure.BinaryTreeLeft)
+	}
 
-			ptr.Right().IfPresentElse(
-				func(value *structure.BinaryTreeNode[Window]) {
-					ptr = value
-				},
-				func() {
-					f = true
-				})
-
-			if f {
-				break
-			}
-		}
-
-		engine.WindowChildAdd(ptr, objects.Init[WindowImage](&WindowImage{}))
+	if rl.IsKeyPressed(rl.KeyL) {
+		engine.selected = engine.WindowChildAdd(engine.selected, objects.Init[WindowImage](&WindowImage{}), structure.BinaryTreeRight)
 	}
 
 	return
 }
 
-func (engine *Engine) WindowChildAdd(window *structure.BinaryTreeNode[Window], child Window) {
-	result := window.Value().Split()
+func (engine *Engine) WindowChildAdd(window *structure.BinaryTreeNode[Window], child Window, direction structure.BinaryTreeDirection) (result *structure.BinaryTreeNode[Window]) {
+	data := window.Value().Split(direction)
 
-	child.SetPosition(result.A())
-	child.SetSize(result.B())
+	child.SetPosition(data.A())
+	child.SetSize(data.B())
 
-	window.AddRight(child)
+	result = window.ChildAdd(child, direction)
+	return
 }
 
 func (engine *Engine) Render() (err error) {
@@ -138,6 +129,8 @@ func (engine *Engine) RenderWindows() (err error) {
 }
 
 func (engine *Engine) RenderWindow(path []int, window *structure.BinaryTreeNode[Window]) (err error) {
+	window.Value().SetSelected(window.Value().Id() == engine.selected.Value().Id())
+
 	err = window.Value().Render(engine.Screen(), engine.Cursor())
 	if err != nil {
 		return

@@ -86,3 +86,17 @@ func (vector Vector2[T]) Inv() Vector2[T] {
 		Inv(vector.x),
 		Inv(vector.y))
 }
+
+func (vector Vector2[T]) Rev() Vector2[T] {
+	return NewVector2(
+		vector.Y(),
+		vector.X())
+}
+
+func (vector Vector2[T]) Order(reversed bool) Vector2[T] {
+	if reversed {
+		return vector.Rev()
+	} else {
+		return vector.Copy()
+	}
+}

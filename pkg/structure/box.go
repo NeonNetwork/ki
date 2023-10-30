@@ -1,5 +1,7 @@
 package structure
 
+import rl "github.com/gen2brain/raylib-go/raylib"
+
 type Box[T Number] struct {
 	position Vector2[T]
 	size     Vector2[T]
@@ -10,6 +12,14 @@ func NewBox[T Number](position Vector2[T], size Vector2[T]) Box[T] {
 		position: position,
 		size:     size,
 	}
+}
+
+func (box Box[T]) ToRaylibRectangle() rl.Rectangle {
+	return rl.NewRectangle(
+		float32(box.X()),
+		float32(box.Y()),
+		float32(box.W()),
+		float32(box.H()))
 }
 
 func (box Box[T]) X() T {

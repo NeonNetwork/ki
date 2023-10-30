@@ -6,9 +6,11 @@ import (
 )
 
 const (
-	BinaryTreeLeft = iota
+	BinaryTreeLeft  BinaryTreeDirection = iota
 	BinaryTreeRight
 )
+
+type BinaryTreeDirection int8
 
 type BinaryTreeNode[T any] struct {
 	value     T
@@ -62,6 +64,28 @@ func NewBinaryTreeNode[T any](value T) (node *BinaryTreeNode[T]) {
 
 func (node *BinaryTreeNode[T]) IsRoot() bool {
 	return node.Prev().IsEmpty()
+}
+
+func (node *BinaryTreeNode[T]) ChildGet(direction BinaryTreeDirection) (result optionals.Optional[*BinaryTreeNode[T]]) {
+	switch direction {
+	case BinaryTreeLeft:
+		return node.Left()
+	case BinaryTreeRight:
+		return node.Right()
+	}
+
+	return optionals.None[*BinaryTreeNode[T]]()
+}
+
+func (node *BinaryTreeNode[T]) ChildAdd(value T, direction BinaryTreeDirection) (result *BinaryTreeNode[T]) {
+	switch direction {
+	case BinaryTreeLeft:
+		return node.AddLeft(value)
+	case BinaryTreeRight:
+		return node.AddRight(value)
+	}
+
+	return nil
 }
 
 func (node *BinaryTreeNode[T]) AddLeft(value T) (result *BinaryTreeNode[T]) {
