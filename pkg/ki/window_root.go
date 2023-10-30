@@ -47,7 +47,6 @@ func (window *RootWindow) SetSelected(value bool) {
 	window.selected = value
 }
 
-
 func (window *RootWindow) Init() *RootWindow {
 	window.id = uuid.New()
 
@@ -58,17 +57,16 @@ func (window *RootWindow) Render(screen structure.Vector2[int32], cursor structu
 	return
 }
 
-func (window *RootWindow) Split(direction structure.BinaryTreeDirection) (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
-	size := window.size.Copy()
-	cut := size.Div(structure.NewVector2[int32](2, 1))
+func (window *RootWindow) Split(axis WindowSplitAxis, direction structure.BinaryTreeDirection) (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
+	window.SetSplitAxis(axis)
 
-	result = structure.NewPair(
-		window.Position().Add(cut.Mul(structure.NewVector2[int32](1, 0))),
-		cut)
-
-	return
+	return WindowSplitCommon(window, direction)
 }
 
 func (window *RootWindow) SplitAxis() WindowSplitAxis {
 	return window.axis
+}
+
+func (window *RootWindow) SetSplitAxis(value WindowSplitAxis) {
+	window.axis = value
 }

@@ -17,11 +17,7 @@ type Engine struct {
 }
 
 func (engine *Engine) Init() *Engine {
-	engine.windows = structure.NewBinaryTreeNode[Window](objects.Init[RootWindow](&RootWindow{
-		position: structure.NewVector2[int32](0, 0),
-		size:     structure.NewVector2[int32](EngineWindowUnit, EngineWindowUnit),
-	}))
-
+	engine.windows = nil
 	engine.selected = engine.windows
 
 	return engine
@@ -81,24 +77,96 @@ func (engine *Engine) HandleInputs() (err error) {
 		rl.ToggleFullscreen()
 	}
 
-	if rl.IsKeyPressed(rl.KeyH) {
-		engine.selected = engine.WindowChildAdd(engine.selected, objects.Init[WindowImage](&WindowImage{}), structure.BinaryTreeLeft)
-	}
+	if rl.IsKeyDown(rl.KeyLeftShift) {
+		if rl.IsKeyPressed(rl.KeyJ) {
+			engine.selected.
+				Prev().
+				IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+					engine.selected = value
+				})
+		}
 
-	if rl.IsKeyPressed(rl.KeyL) {
-		engine.selected = engine.WindowChildAdd(engine.selected, objects.Init[WindowImage](&WindowImage{}), structure.BinaryTreeRight)
+		if rl.IsKeyPressed(rl.KeyH) {
+			engine.selected.
+				Left().
+				IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+					engine.selected = value
+				})
+		}
+
+		if rl.IsKeyPressed(rl.KeyL) {
+			engine.selected.
+				Right().
+				IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+					engine.selected = value
+				})
+		}
+	} else {
+		if rl.IsKeyPressed(rl.KeyH) {
+			engine.selected = engine.WindowChildAdd(
+				engine.selected,
+				objects.Init[WindowImage](&WindowImage{}),
+				WindowSplitHorizontal,
+				structure.BinaryTreeLeft)
+		}
+
+		if rl.IsKeyPressed(rl.KeyJ) {
+			engine.selected = engine.WindowChildAdd(
+				engine.selected,
+				objects.Init[WindowImage](&WindowImage{}),
+				WindowSplitVertical,
+				structure.BinaryTreeRight)
+		}
+
+		if rl.IsKeyPressed(rl.KeyK) {
+			engine.selected = engine.WindowChildAdd(
+				engine.selected,
+				objects.Init[WindowImage](&WindowImage{}),
+				WindowSplitVertical,
+				structure.BinaryTreeLeft)
+		}
+
+		if rl.IsKeyPressed(rl.KeyL) {
+			engine.selected = engine.WindowChildAdd(
+				engine.selected,
+				objects.Init[WindowImage](&WindowImage{}),
+				WindowSplitHorizontal,
+				structure.BinaryTreeRight)
+		}
 	}
 
 	return
 }
 
-func (engine *Engine) WindowChildAdd(window *structure.BinaryTreeNode[Window], child Window, direction structure.BinaryTreeDirection) (result *structure.BinaryTreeNode[Window]) {
-	data := window.Value().Split(direction)
+func (engine *Engine) WindowChildAdd(
+	window *structure.BinaryTreeNode[Window],
+	child Window,
+	axis WindowSplitAxis,
+	direction structure.BinaryTreeDirection,
+) (result *structure.BinaryTreeNode[Window]) {
+	var (
+		data structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]
+	)
+
+	if window == nil {
+		data = structure.NewPair(
+			structure.NewVector2[int32](0, 0),
+			structure.NewVector2[int32](EngineWindowUnit, EngineWindowUnit))
+	} else {
+		data = window.Value().Split(axis, direction)
+	}
 
 	child.SetPosition(data.A())
 	child.SetSize(data.B())
 
-	result = window.ChildAdd(child, direction)
+	if window == nil {
+		result = structure.NewBinaryTreeNode(child)
+
+		engine.windows = result
+	} else {
+		result = window.ChildAdd(child, direction)
+	}
+
 	return
 }
 
@@ -120,6 +188,10 @@ func (engine *Engine) Render() (err error) {
 }
 
 func (engine *Engine) RenderWindows() (err error) {
+	if engine.windows == nil {
+		return
+	}
+
 	err = engine.RenderWindow([]int{}, engine.windows)
 	if err != nil {
 		return

@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	BinaryTreeLeft  BinaryTreeDirection = iota
+	BinaryTreeLeft BinaryTreeDirection = iota
 	BinaryTreeRight
 )
 

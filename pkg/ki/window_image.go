@@ -71,7 +71,7 @@ func (window *WindowImage) ScaledPosition(screen structure.Vector2[int32]) struc
 		structure.MapVector2[int32, float64](window.Position(), structure.ConvertNumberInt32toFloat64).
 			Div(structure.NewVector2[float64](float64(EngineWindowUnit), float64(EngineWindowUnit))).
 			Mul(structure.MapVector2[int32, float64](screen, structure.ConvertNumberInt32toFloat64)),
-			structure.ConvertNumberFloat64toInt32)
+		structure.ConvertNumberFloat64toInt32)
 }
 
 func (window *WindowImage) ScaledSize(screen structure.Vector2[int32]) structure.Vector2[int32] {
@@ -79,7 +79,7 @@ func (window *WindowImage) ScaledSize(screen structure.Vector2[int32]) structure
 		structure.MapVector2[int32, float64](window.Size(), structure.ConvertNumberInt32toFloat64).
 			Div(structure.NewVector2[float64](float64(EngineWindowUnit), float64(EngineWindowUnit))).
 			Mul(structure.MapVector2[int32, float64](screen, structure.ConvertNumberInt32toFloat64)),
-			structure.ConvertNumberFloat64toInt32)
+		structure.ConvertNumberFloat64toInt32)
 }
 
 func (window *WindowImage) ScaledBox(screen structure.Vector2[int32]) structure.Box[int32] {
@@ -111,37 +111,16 @@ func (window *WindowImage) Render(screen structure.Vector2[int32], cursor struct
 	return
 }
 
-func (window *WindowImage) Split(direction structure.BinaryTreeDirection) (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
-	var (
-		zero structure.Vector2[int32]
-		size structure.Vector2[int32]
-		diff structure.Vector2[int32]
-	)
+func (window *WindowImage) Split(axis WindowSplitAxis, direction structure.BinaryTreeDirection) (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
+	window.SetSplitAxis(axis)
 
-	zero = structure.NewVector2[int32](0, 0)           // [0    , 0]
-	size = window.size.Copy()                               // [W    , H]
-	size = size.Div(structure.NewVector2[int32](2, 1)) // [W / 2, H]
-	diff = size.Mul(structure.NewVector2[int32](1, 0)) // [W / 2, 0]
-
-	if direction == structure.BinaryTreeLeft {
-		result = structure.NewPair(
-			window.Position().Add(zero),
-			size)
-
-		window.size = size
-		window.position = window.position.Add(diff)
-	} else {
-		result = structure.NewPair(
-			window.Position().Add(diff),
-			size)
-
-		window.size = size
-		window.position = window.position.Add(zero)
-	}
-
-	return
+	return WindowSplitCommon(window, direction)
 }
 
-func (window *RootWindow) SplitAxis() WindowSplitAxis {
+func (window *WindowImage) SplitAxis() WindowSplitAxis {
 	return window.axis
+}
+
+func (window *WindowImage) SetSplitAxis(value WindowSplitAxis) {
+	window.axis = value
 }
