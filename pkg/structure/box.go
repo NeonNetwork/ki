@@ -1,6 +1,8 @@
 package structure
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 type Box[T Number] struct {
 	position Vector2[T]

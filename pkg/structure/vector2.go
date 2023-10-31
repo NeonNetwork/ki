@@ -10,10 +10,10 @@ type Vector2[T Number] struct {
 	y T
 }
 
-func NewVector2[T Number](x T, y T) Vector2[T] {
+func NewVector2[T Number, V Number](x V, y V) Vector2[T] {
 	return Vector2[T]{
-		x: x,
-		y: y,
+		x: T(x),
+		y: T(y),
 	}
 }
 
@@ -46,7 +46,7 @@ func (vector Vector2[T]) ToRaylib() rl.Vector2 {
 }
 
 func (vector Vector2[T]) Copy() Vector2[T] {
-	return NewVector2(
+	return NewVector2[T, T](
 		vector.x,
 		vector.y)
 }
@@ -88,7 +88,7 @@ func (vector Vector2[T]) Inv() Vector2[T] {
 }
 
 func (vector Vector2[T]) Rev() Vector2[T] {
-	return NewVector2(
+	return NewVector2[T](
 		vector.Y(),
 		vector.X())
 }

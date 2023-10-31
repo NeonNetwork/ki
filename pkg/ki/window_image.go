@@ -1,19 +1,24 @@
 package ki
 
 import (
+	"os"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/google/uuid"
 	"github.com/neonnetwork/ki/pkg/structure"
-	"os"
 )
 
 type WindowImage struct {
-	id       uuid.UUID
-	position structure.Vector2[int32]
-	size     structure.Vector2[int32]
-	axis     WindowSplitAxis
-	selected bool
-	color    structure.Vector3[uint8]
+	id          uuid.UUID
+	isRoot      bool
+	side        structure.BinaryTreeDirection
+	position    structure.Vector2[int32]
+	positionAbs structure.Vector2[int32]
+	size        structure.Vector2[int32]
+	sizeAbs     structure.Vector2[int32]
+	axis        WindowSplitAxis
+	selected    bool
+	color       structure.Vector3[uint8]
 
 	texture rl.Texture2D
 }
@@ -22,30 +27,56 @@ func (window *WindowImage) Id() uuid.UUID {
 	return window.id
 }
 
+func (window *WindowImage) IsRoot() bool {
+	return window.isRoot
+}
+
+func (window *WindowImage) SetIsRoot(value bool) {
+	window.isRoot = value
+}
+
+func (window *WindowImage) Side() structure.BinaryTreeDirection {
+	return window.side
+}
+
+func (window *WindowImage) SetSide(value structure.BinaryTreeDirection) {
+	window.side = value
+}
+
 func (window *WindowImage) Position() structure.Vector2[int32] {
 	return window.position
-}
-
-func (window *WindowImage) Size() structure.Vector2[int32] {
-	return window.size
-}
-
-func (window *WindowImage) Box() structure.Box[int32] {
-	return structure.NewBox[int32](
-		window.Position(),
-		window.Size())
-}
-
-func (window *WindowImage) Color() structure.Vector3[uint8] {
-	return window.color
 }
 
 func (window *WindowImage) SetPosition(value structure.Vector2[int32]) {
 	window.position = value
 }
 
+func (window *WindowImage) PositionAbsolute() structure.Vector2[int32] {
+	return window.positionAbs
+}
+
+func (window *WindowImage) SetPositionAbsolute(value structure.Vector2[int32]) {
+	window.positionAbs = value
+}
+
+func (window *WindowImage) Size() structure.Vector2[int32] {
+	return window.size
+}
+
 func (window *WindowImage) SetSize(value structure.Vector2[int32]) {
 	window.size = value
+}
+
+func (window *WindowImage) SizeAbsolute() structure.Vector2[int32] {
+	return window.sizeAbs
+}
+
+func (window *WindowImage) SetSizeAbsolute(value structure.Vector2[int32]) {
+	window.sizeAbs = value
+}
+
+func (window *WindowImage) Color() structure.Vector3[uint8] {
+	return window.color
 }
 
 func (window *WindowImage) Selected() bool {
@@ -56,54 +87,47 @@ func (window *WindowImage) SetSelected(value bool) {
 	window.selected = value
 }
 
+func (window *WindowImage) SplitAxis() WindowSplitAxis {
+	return window.axis
+}
+
+func (window *WindowImage) SetSplitAxis(value WindowSplitAxis) {
+	window.axis = value
+}
+
 func (window *WindowImage) Init() *WindowImage {
 	window.id = uuid.New()
-
 	window.color = structure.NewVector3Random[byte](256)
-
 	window.texture = rl.LoadTexture(os.Getenv("TEXTURE"))
 
 	return window
 }
 
-func (window *WindowImage) ScaledPosition(screen structure.Vector2[int32]) structure.Vector2[int32] {
-	return structure.MapVector2[float64, int32](
-		structure.MapVector2[int32, float64](window.Position(), structure.ConvertNumberInt32toFloat64).
-			Div(structure.NewVector2[float64](float64(EngineWindowUnit), float64(EngineWindowUnit))).
-			Mul(structure.MapVector2[int32, float64](screen, structure.ConvertNumberInt32toFloat64)),
-		structure.ConvertNumberFloat64toInt32)
+func (window *WindowImage) Box() structure.Box[int32] {
+	return structure.NewBox[int32](
+		window.Position(),
+		window.Size())
 }
 
-func (window *WindowImage) ScaledSize(screen structure.Vector2[int32]) structure.Vector2[int32] {
-	return structure.MapVector2[float64, int32](
-		structure.MapVector2[int32, float64](window.Size(), structure.ConvertNumberInt32toFloat64).
-			Div(structure.NewVector2[float64](float64(EngineWindowUnit), float64(EngineWindowUnit))).
-			Mul(structure.MapVector2[int32, float64](screen, structure.ConvertNumberInt32toFloat64)),
-		structure.ConvertNumberFloat64toInt32)
+func (window *WindowImage) BoxAbs() structure.Box[int32] {
+	return structure.NewBox[int32](
+		window.PositionAbsolute(),
+		window.SizeAbsolute())
 }
 
-func (window *WindowImage) ScaledBox(screen structure.Vector2[int32]) structure.Box[int32] {
-	return structure.NewBox(window.ScaledPosition(screen), window.ScaledSize(screen))
-}
-
-func (window *WindowImage) Render(screen structure.Vector2[int32], cursor structure.Vector2[int32]) (err error) {
-	position := window.ScaledPosition(screen)
-	size := window.ScaledSize(screen)
-
-	c := window.Color().ToColor()
-	if window.ScaledBox(screen).CollisionPoint(cursor) {
-		c = rl.Red
-	}
+func (window *WindowImage) Render() (err error) {
+	position := window.PositionAbsolute()
+	size := window.SizeAbsolute()
 
 	rl.DrawTextureRec(
 		window.texture,
 		rl.NewRectangle(0, 0, float32(size.X()), float32(size.Y())),
 		position.ToRaylib(),
-		c)
+		window.Color().ToColor())
 
 	if window.Selected() {
 		rl.DrawRectangleLinesEx(
-			window.ScaledBox(screen).ToRaylibRectangle(),
+			window.BoxAbs().ToRaylibRectangle(),
 			2,
 			rl.RayWhite)
 	}
@@ -111,16 +135,6 @@ func (window *WindowImage) Render(screen structure.Vector2[int32], cursor struct
 	return
 }
 
-func (window *WindowImage) Split(axis WindowSplitAxis, direction structure.BinaryTreeDirection) (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
-	window.SetSplitAxis(axis)
-
+func (window *WindowImage) Split(direction structure.BinaryTreeDirection) (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
 	return WindowSplitCommon(window, direction)
-}
-
-func (window *WindowImage) SplitAxis() WindowSplitAxis {
-	return window.axis
-}
-
-func (window *WindowImage) SetSplitAxis(value WindowSplitAxis) {
-	window.axis = value
 }

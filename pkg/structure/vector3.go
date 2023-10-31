@@ -1,8 +1,9 @@
 package structure
 
 import (
-	"golang.org/x/exp/rand"
 	"image/color"
+
+	"golang.org/x/exp/rand"
 )
 
 type Vector3[T Number] struct {

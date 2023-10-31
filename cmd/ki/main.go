@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/heartbytenet/bblib/objects"
 	"github.com/neonnetwork/ki/pkg/ki"
-	"log"
 )
 
 var (
