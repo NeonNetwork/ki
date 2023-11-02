@@ -10,6 +10,7 @@ import (
 
 type WindowImage struct {
 	id          uuid.UUID
+	node        *structure.BinaryTreeNode[Window]
 	isRoot      bool
 	side        structure.BinaryTreeDirection
 	position    structure.Vector2[int32]
@@ -27,12 +28,24 @@ func (window *WindowImage) Id() uuid.UUID {
 	return window.id
 }
 
+func (window *WindowImage) Node() *structure.BinaryTreeNode[Window] {
+	return window.node
+}
+
+func (window *WindowImage) SetNode(value *structure.BinaryTreeNode[Window]) {
+	window.node = value
+
+	return
+}
+
 func (window *WindowImage) IsRoot() bool {
 	return window.isRoot
 }
 
 func (window *WindowImage) SetIsRoot(value bool) {
 	window.isRoot = value
+
+	return
 }
 
 func (window *WindowImage) Side() structure.BinaryTreeDirection {
@@ -41,6 +54,8 @@ func (window *WindowImage) Side() structure.BinaryTreeDirection {
 
 func (window *WindowImage) SetSide(value structure.BinaryTreeDirection) {
 	window.side = value
+
+	return
 }
 
 func (window *WindowImage) Position() structure.Vector2[int32] {
@@ -49,6 +64,8 @@ func (window *WindowImage) Position() structure.Vector2[int32] {
 
 func (window *WindowImage) SetPosition(value structure.Vector2[int32]) {
 	window.position = value
+
+	return
 }
 
 func (window *WindowImage) PositionAbsolute() structure.Vector2[int32] {
@@ -57,6 +74,8 @@ func (window *WindowImage) PositionAbsolute() structure.Vector2[int32] {
 
 func (window *WindowImage) SetPositionAbsolute(value structure.Vector2[int32]) {
 	window.positionAbs = value
+
+	return
 }
 
 func (window *WindowImage) Size() structure.Vector2[int32] {
@@ -65,6 +84,8 @@ func (window *WindowImage) Size() structure.Vector2[int32] {
 
 func (window *WindowImage) SetSize(value structure.Vector2[int32]) {
 	window.size = value
+
+	return
 }
 
 func (window *WindowImage) SizeAbsolute() structure.Vector2[int32] {
@@ -73,6 +94,8 @@ func (window *WindowImage) SizeAbsolute() structure.Vector2[int32] {
 
 func (window *WindowImage) SetSizeAbsolute(value structure.Vector2[int32]) {
 	window.sizeAbs = value
+
+	return
 }
 
 func (window *WindowImage) Color() structure.Vector3[uint8] {
@@ -85,6 +108,8 @@ func (window *WindowImage) Selected() bool {
 
 func (window *WindowImage) SetSelected(value bool) {
 	window.selected = value
+
+	return
 }
 
 func (window *WindowImage) SplitAxis() WindowSplitAxis {
@@ -93,6 +118,8 @@ func (window *WindowImage) SplitAxis() WindowSplitAxis {
 
 func (window *WindowImage) SetSplitAxis(value WindowSplitAxis) {
 	window.axis = value
+
+	return
 }
 
 func (window *WindowImage) Init() *WindowImage {

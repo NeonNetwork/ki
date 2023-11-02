@@ -3,7 +3,6 @@ package ki
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/neonnetwork/ki/pkg/structure"
-	"log"
 )
 
 func (engine *Engine) Render() (err error) {
@@ -54,6 +53,43 @@ func (engine *Engine) RenderWindows() (err error) {
 
 			if window.IsRoot() {
 				err = window.Render()
+				if err != nil {
+					return nil, err
+				}
+			}
+			{
+				value.Position = window.PositionAbsolute()
+
+				window.
+					Node().
+					Left().
+					IfPresent(func(node *structure.BinaryTreeNode[Window]) {
+						node.Value().SetPositionAbsolute(value.Position)
+
+						value.Position = value.Position.Add(node.Value().SizeAbsolute())
+
+						err = node.Value().Render()
+						if err != nil {
+							return
+						}
+					})
+				if err != nil {
+					return nil, err
+				}
+
+				window.
+					Node().
+					Right().
+					IfPresent(func(node *structure.BinaryTreeNode[Window]) {
+						node.Value().SetPositionAbsolute(value.Position)
+
+						value.Position = value.Position.Add(node.Value().SizeAbsolute())
+
+						err = node.Value().Render()
+						if err != nil {
+							return
+						}
+					})
 				if err != nil {
 					return nil, err
 				}

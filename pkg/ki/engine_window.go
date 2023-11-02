@@ -1,6 +1,9 @@
 package ki
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/neonnetwork/ki/pkg/structure"
 )
 
@@ -35,5 +38,29 @@ func (engine *Engine) WindowChildAdd(
 		result = window.ChildAdd(child, direction)
 	}
 
+	child.SetNode(result)
+
 	return
+}
+
+func (engine *Engine) WindowTreePrint() {
+	engine.IterateWindows(func(window Window, data any) (any, error) {
+		value := data.(int)
+
+		fmt.Println("")
+		fmt.Print(strings.Repeat(" ", value))
+		if window.Selected() {
+			fmt.Print(">")
+		} else {
+			fmt.Print(" ")
+		}
+		fmt.Printf(
+			"%s_%v[%v-%v]",
+			window.Id().String()[:4],
+			window.IsRoot(),
+			window.PositionAbsolute(),
+			window.SizeAbsolute())
+
+		return value + 32, nil
+	}, 0)
 }

@@ -59,7 +59,6 @@ func (engine *Engine) ComputeWindows() (err error) {
 
 			value = data.(IterateDataCompute)
 
-			// window.SetPositionAbsolute(structure.MapVector2(value.Position, structure.ConvertNumberFloat64toInt32))
 			window.SetSizeAbsolute(structure.MapVector2(value.Size, structure.ConvertNumberFloat64toInt32))
 
 			if engine.selected != nil {

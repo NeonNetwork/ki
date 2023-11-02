@@ -3,6 +3,7 @@ package ki
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/heartbytenet/bblib/containers/optionals"
+	"github.com/heartbytenet/bblib/objects"
 
 	"github.com/neonnetwork/ki/pkg/structure"
 )
@@ -33,8 +34,10 @@ func (engine *Engine) WindowRootNode() optionals.Optional[*structure.BinaryTreeN
 }
 
 func (engine *Engine) Init() *Engine {
-	engine.windows = nil
+	engine.windows = structure.NewBinaryTreeNode[Window](objects.Init[WindowRoot](&WindowRoot{}))
 	engine.selected = engine.windows
+
+	engine.windows.Value().SetNode(engine.windows)
 
 	return engine
 }

@@ -14,6 +14,8 @@ type WindowSplitAxis int8
 
 type Window interface {
 	Id() uuid.UUID
+	Node() *structure.BinaryTreeNode[Window]
+	SetNode(value *structure.BinaryTreeNode[Window])
 	IsRoot() bool
 	SetIsRoot(bool)
 	Side() structure.BinaryTreeDirection
