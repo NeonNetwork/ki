@@ -89,6 +89,11 @@ func (node *BinaryTreeNode[T]) ChildAdd(value T, direction BinaryTreeDirection) 
 }
 
 func (node *BinaryTreeNode[T]) AddLeft(value T) (result *BinaryTreeNode[T]) {
+	if node.Left().IsPresent() {
+		result = nil
+		return
+	}
+
 	result = NewBinaryTreeNode(value)
 
 	result.prev = node
@@ -98,6 +103,11 @@ func (node *BinaryTreeNode[T]) AddLeft(value T) (result *BinaryTreeNode[T]) {
 }
 
 func (node *BinaryTreeNode[T]) AddRight(value T) (result *BinaryTreeNode[T]) {
+	if node.Right().IsPresent() {
+		result = nil
+		return
+	}
+
 	result = NewBinaryTreeNode(value)
 
 	result.prev = node

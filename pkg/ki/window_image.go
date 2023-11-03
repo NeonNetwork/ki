@@ -28,6 +28,10 @@ func (window *WindowImage) Id() uuid.UUID {
 	return window.id
 }
 
+func (window *WindowImage) Type() WindowType {
+	return WindowTypeImage
+}
+
 func (window *WindowImage) Node() *structure.BinaryTreeNode[Window] {
 	return window.node
 }
@@ -162,6 +166,3 @@ func (window *WindowImage) Render() (err error) {
 	return
 }
 
-func (window *WindowImage) Split(direction structure.BinaryTreeDirection) (result structure.Pair[structure.Vector2[int32], structure.Vector2[int32]]) {
-	return WindowSplitCommon(window, direction)
-}

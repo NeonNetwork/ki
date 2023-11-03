@@ -3,7 +3,6 @@ package ki
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/heartbytenet/bblib/containers/optionals"
-	"github.com/heartbytenet/bblib/objects"
 
 	"github.com/neonnetwork/ki/pkg/structure"
 )
@@ -15,6 +14,8 @@ const (
 type Engine struct {
 	windows  *structure.BinaryTreeNode[Window]
 	selected *structure.BinaryTreeNode[Window]
+
+	windowsFloating []Window
 }
 
 func (engine *Engine) WindowRoot() optionals.Optional[Window] {
@@ -34,10 +35,10 @@ func (engine *Engine) WindowRootNode() optionals.Optional[*structure.BinaryTreeN
 }
 
 func (engine *Engine) Init() *Engine {
-	engine.windows = structure.NewBinaryTreeNode[Window](objects.Init[WindowRoot](&WindowRoot{}))
+	engine.windows = nil
 	engine.selected = engine.windows
 
-	engine.windows.Value().SetNode(engine.windows)
+	engine.windowsFloating = make([]Window, 0)
 
 	return engine
 }
@@ -94,50 +95,4 @@ func (engine *Engine) Cursor() structure.Vector2[int32] {
 	return structure.NewVector2[int32](
 		rl.GetMouseX(),
 		rl.GetMouseY())
-}
-
-func (engine *Engine) IterateWindows(fn func(Window, any) (any, error), data any) (err error) {
-	engine.WindowRootNode().
-		IfPresent(func(value *structure.BinaryTreeNode[Window]) {
-			err = engine.IterateWindow(value, fn, data)
-			if err != nil {
-				return
-			}
-		})
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-func (engine *Engine) IterateWindow(node *structure.BinaryTreeNode[Window], fn func(Window, any) (any, error), data any) (err error) {
-	data, err = fn(node.Value(), data)
-	if err != nil {
-		return
-	}
-
-	node.Left().
-		IfPresent(func(value *structure.BinaryTreeNode[Window]) {
-			err = engine.IterateWindow(value, fn, data)
-			if err != nil {
-				return
-			}
-		})
-	if err != nil {
-		return
-	}
-
-	node.Right().
-		IfPresent(func(value *structure.BinaryTreeNode[Window]) {
-			err = engine.IterateWindow(value, fn, data)
-			if err != nil {
-				return
-			}
-		})
-	if err != nil {
-		return
-	}
-
-	return
 }
