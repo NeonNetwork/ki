@@ -13,8 +13,8 @@ const (
 type WindowSplitAxis int8
 
 const (
-	WindowTypeNone  WindowType = iota
-	WindowTypeRoot
+	WindowTypeNone WindowType = iota
+	WindowTypeSplit
 	WindowTypeImage
 )
 

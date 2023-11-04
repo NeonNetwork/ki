@@ -2,12 +2,13 @@ package ki
 
 import (
 	"fmt"
+	"github.com/heartbytenet/bblib/objects"
 	"strings"
 
 	"github.com/neonnetwork/ki/pkg/structure"
 )
 
-func (engine *Engine) WindowSplitCommon(window Window, direction structure.BinaryTreeDirection) (result structure.Box[int32]) {
+func (engine *Engine) WindowSplitCommon(window Window, direction structure.BinaryTreeDirection) (result structure.Pair[structure.Box[int32], structure.Box[int32]]) {
 	var (
 		axis WindowSplitAxis
 		vert bool
@@ -18,60 +19,71 @@ func (engine *Engine) WindowSplitCommon(window Window, direction structure.Binar
 
 	axis = window.SplitAxis()                // W          || H
 	vert = axis == WindowSplitVertical       // true       || false
-	zero = structure.NewVector2[int32](0, 0) // [0    , 0] || [0, 0]
+	zero = structure.NewVector2[int32](0, 0) // [0 , 0] || [0, 0]
 	size = structure.NewVector2[int32](EngineWindowUnit, EngineWindowUnit)
 	size = size.Div(structure.NewVector2[int32](2, 1).Order(vert)) // [W / 2, H] || [W, H / 2]
 	diff = size.Mul(structure.NewVector2[int32](1, 0).Order(vert)) // [W / 2, 0] || [0, H / 2]
 
 	if direction == structure.BinaryTreeLeft {
-		result = structure.NewBox(
-			window.Position().Add(zero),
-			size)
-
-		window.SetSize(size)
-		window.SetPosition(window.Position().Add(diff))
+		result = structure.NewPair(
+			structure.NewBox(zero.Add(diff), size),
+			structure.NewBox(zero.Add(zero), size))
 	} else {
-		result = structure.NewBox(
-			window.Position().Add(diff),
-			size)
-
-		window.SetSize(size)
-		window.SetPosition(window.Position().Add(zero))
+		result = structure.NewPair(
+			structure.NewBox(zero.Add(zero), size),
+			structure.NewBox(zero.Add(diff), size))
 	}
 
 	return
 }
 
 func (engine *Engine) WindowChildAdd(
-	node      *structure.BinaryTreeNode[Window],
-	value     Window,
-	axis      WindowSplitAxis,
+	node *structure.BinaryTreeNode[Window],
+	value Window,
+	axis WindowSplitAxis,
 	direction structure.BinaryTreeDirection,
 ) (result *structure.BinaryTreeNode[Window]) {
 	var (
+		split  Window
 		window Window
-		size   structure.Box[int32]
+		data   structure.Pair[structure.Box[int32], structure.Box[int32]]
 	)
 
 	if node == nil {
-		size = structure.NewBox(
-			structure.NewVector2[int32](0, 0),
-			structure.NewVector2[int32](EngineWindowUnit, EngineWindowUnit))
+		data = structure.NewPair(
+			structure.NewBox(structure.NewVector2[int32](0, 0), structure.NewVector2[int32](0, 0)),
+			structure.NewBox(structure.NewVector2[int32](0, 0), structure.NewVector2[int32](EngineWindowUnit, EngineWindowUnit)))
 	} else {
 		window = node.Value()
 
-		size = engine.WindowSplitCommon(window, direction)
+		split = objects.Init[WindowSplit](&WindowSplit{})
+		split.SetSide(window.Side())
+		split.SetSplitAxis(axis)
+		split.SetPosition(window.Position())
+		split.SetSize(window.Size())
+
+		data = engine.WindowSplitCommon(split, direction)
+
+		window.SetSide(direction.Opposite())
+		window.SetPosition(data.A().Position())
+		window.SetSize(data.A().Size())
 	}
 
 	value.SetSide(direction)
-	value.SetPosition(size.Position())
-	value.SetSize(size.Size())
+	value.SetPosition(data.B().Position())
+	value.SetSize(data.B().Size())
 
 	if node == nil {
 		result = structure.NewBinaryTreeNode(value)
 
 		engine.windows = result
 	} else {
+		node.SetValue(split)
+		split.SetNode(node)
+
+		previous := node.ChildAdd(window, window.Side())
+		window.SetNode(previous)
+
 		result = node.ChildAdd(value, direction)
 	}
 
@@ -81,35 +93,34 @@ func (engine *Engine) WindowChildAdd(
 }
 
 func (engine *Engine) WindowTreePrint() {
+	fmt.Println()
 	engine.WindowRootNode().IfPresent(func(value *structure.BinaryTreeNode[Window]) {
-		engine.WindowTreePrintStep(value, 0, 32)
+		engine.WindowTreePrintStep(value, 0, 8)
 	})
 }
 
 func (engine *Engine) WindowTreePrintStep(node *structure.BinaryTreeNode[Window], level int, step int) {
 	window := node.Value()
 
-
-	fmt.Println("")
+	fmt.Println()
 	fmt.Print(strings.Repeat(" ", level))
 	if window.Selected() {
-		fmt.Print(">")
+		fmt.Print("+")
 	} else {
-		fmt.Print(" ")
+		fmt.Print("-")
 	}
 	fmt.Printf(
-		"%s_%v[%v-%v]",
+		"%s->%v[%v][%v]",
 		window.Id().String()[:4],
-		window.IsRoot(),
-		window.PositionAbsolute(),
-		window.SizeAbsolute())
-
+		window.Type(),
+		window.Box(),
+		window.BoxAbs())
 
 	node.Left().IfPresent(func(value *structure.BinaryTreeNode[Window]) {
-		engine.WindowTreePrintStep(value, level + step, step)
+		engine.WindowTreePrintStep(value, level+step, step)
 	})
 
 	node.Right().IfPresent(func(value *structure.BinaryTreeNode[Window]) {
-		engine.WindowTreePrintStep(value, level + step, step)
+		engine.WindowTreePrintStep(value, level+step, step)
 	})
 }

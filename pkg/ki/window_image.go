@@ -165,4 +165,3 @@ func (window *WindowImage) Render() (err error) {
 
 	return
 }
-

@@ -34,6 +34,22 @@ func (engine *Engine) WindowRootNode() optionals.Optional[*structure.BinaryTreeN
 	return optionals.Some(engine.windows)
 }
 
+func (engine *Engine) WindowSelected() optionals.Optional[Window] {
+	return optionals.FlatMap[*structure.BinaryTreeNode[Window], Window](
+		engine.WindowSelectedNode(),
+		func(value *structure.BinaryTreeNode[Window]) optionals.Optional[Window] {
+			return optionals.Some(value.Value())
+		})
+}
+
+func (engine *Engine) WindowSelectedNode() optionals.Optional[*structure.BinaryTreeNode[Window]] {
+	if engine.selected == nil {
+		return optionals.None[*structure.BinaryTreeNode[Window]]()
+	}
+
+	return optionals.Some(engine.selected)
+}
+
 func (engine *Engine) Init() *Engine {
 	engine.windows = nil
 	engine.selected = engine.windows

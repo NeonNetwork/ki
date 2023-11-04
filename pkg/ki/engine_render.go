@@ -36,5 +36,41 @@ func (engine *Engine) RenderCursor() (err error) {
 }
 
 func (engine *Engine) RenderWindows() (err error) {
+	engine.WindowRootNode().IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+		err = engine.RenderWindowStep(value)
+	})
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (engine *Engine) RenderWindowStep(node *structure.BinaryTreeNode[Window]) (err error) {
+	var (
+		window Window
+	)
+
+	window = node.Value()
+
+	err = window.Render()
+	if err != nil {
+		return
+	}
+
+	node.Left().IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+		err = engine.RenderWindowStep(value)
+	})
+	if err != nil {
+		return
+	}
+
+	node.Right().IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+		err = engine.RenderWindowStep(value)
+	})
+	if err != nil {
+		return
+	}
+
 	return
 }

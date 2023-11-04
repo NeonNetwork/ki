@@ -16,26 +16,35 @@ func (engine *Engine) HandleInputs() (err error) {
 
 	if rl.IsKeyDown(rl.KeyLeftShift) {
 		if rl.IsKeyPressed(rl.KeyJ) {
-			engine.selected.
-				Prev().
-				IfPresent(func(value *structure.BinaryTreeNode[Window]) {
-					engine.selected = value
+			engine.WindowSelectedNode().
+				IfPresent(func(node *structure.BinaryTreeNode[Window]) {
+					node.
+						Prev().
+						IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+							engine.selected = value
+						})
 				})
 		}
 
 		if rl.IsKeyPressed(rl.KeyH) {
-			engine.selected.
-				Left().
-				IfPresent(func(value *structure.BinaryTreeNode[Window]) {
-					engine.selected = value
+			engine.WindowSelectedNode().
+				IfPresent(func(node *structure.BinaryTreeNode[Window]) {
+					node.
+						Left().
+						IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+							engine.selected = value
+						})
 				})
 		}
 
 		if rl.IsKeyPressed(rl.KeyL) {
-			engine.selected.
-				Right().
-				IfPresent(func(value *structure.BinaryTreeNode[Window]) {
-					engine.selected = value
+			engine.WindowSelectedNode().
+				IfPresent(func(node *structure.BinaryTreeNode[Window]) {
+					node.
+						Right().
+						IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+							engine.selected = value
+						})
 				})
 		}
 	} else {

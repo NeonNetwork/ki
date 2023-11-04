@@ -12,6 +12,14 @@ const (
 
 type BinaryTreeDirection int8
 
+func (direction BinaryTreeDirection) Opposite() BinaryTreeDirection {
+	if direction == BinaryTreeLeft {
+		return BinaryTreeRight
+	} else {
+		return BinaryTreeLeft
+	}
+}
+
 type BinaryTreeNode[T any] struct {
 	value     T
 	prev      *BinaryTreeNode[T]
@@ -21,6 +29,12 @@ type BinaryTreeNode[T any] struct {
 
 func (node *BinaryTreeNode[T]) Value() T {
 	return node.value
+}
+
+func (node *BinaryTreeNode[T]) SetValue(value T) {
+	node.value = value
+
+	return
 }
 
 func (node *BinaryTreeNode[T]) Prev() optionals.Optional[*BinaryTreeNode[T]] {
