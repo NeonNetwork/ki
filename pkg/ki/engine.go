@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	EngineWindowUnit = 65536
+	EngineWindowUnit = 1048576
 )
 
 type Engine struct {

@@ -32,6 +32,17 @@ func (engine *Engine) ComputeWindowsStep(node *structure.BinaryTreeNode[Window])
 	window = node.Value()
 
 	window.SetSelected(engine.selected == node)
+	window.SetIsRoot(engine.windows == node)
+
+	if window.IsRoot() {
+		window.SetPositionAbsolute(structure.NewVector2[int32](0, 0))
+		window.SetSizeAbsolute(engine.Screen())
+	}
+
+	err = window.Compute()
+	if err != nil {
+		return
+	}
 
 	node.Left().IfPresent(func(value *structure.BinaryTreeNode[Window]) {
 		err = engine.ComputeWindowsStep(value)

@@ -45,5 +45,6 @@ type Window interface {
 	Box() structure.Box[int32]
 	BoxAbs() structure.Box[int32]
 
+	Compute() error
 	Render() error
 }

@@ -7,6 +7,7 @@ import (
 
 type WindowSplit struct {
 	id          uuid.UUID
+	isRoot      bool
 	node        *structure.BinaryTreeNode[Window]
 	side        structure.BinaryTreeDirection
 	position    structure.Vector2[int32]
@@ -36,10 +37,12 @@ func (window *WindowSplit) SetNode(value *structure.BinaryTreeNode[Window]) {
 }
 
 func (window *WindowSplit) IsRoot() bool {
-	return false
+	return window.isRoot
 }
 
 func (window *WindowSplit) SetIsRoot(value bool) {
+	window.isRoot = value
+
 	return
 }
 
@@ -134,6 +137,44 @@ func (window *WindowSplit) BoxAbs() structure.Box[int32] {
 	return structure.NewBox[int32](
 		window.PositionAbsolute(),
 		window.SizeAbsolute())
+}
+
+func (window *WindowSplit) Compute() (err error) {
+	var (
+		parent   Window
+		full     structure.Vector2[float64]
+		position structure.Vector2[int32]
+		size     structure.Vector2[int32]
+	)
+
+	full = structure.NewVector2[float64](EngineWindowUnit, EngineWindowUnit)
+
+	window.
+		Node().
+		Prev().
+		IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+			parent = value.Value()
+
+			position, size = parent.PositionAbsolute(), parent.SizeAbsolute()
+
+			position = window.
+				Position().ToFloat64().
+				Div(full).
+				Mul(size.ToFloat64()).
+				ToInt32().
+				Add(position)
+
+			size = window.
+				Size().ToFloat64().
+				Div(full).
+				Mul(size.ToFloat64()).
+				ToInt32()
+
+			window.SetPositionAbsolute(position)
+			window.SetSizeAbsolute(size)
+		})
+
+	return
 }
 
 func (window *WindowSplit) Render() (err error) {

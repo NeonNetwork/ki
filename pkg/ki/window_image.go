@@ -146,6 +146,44 @@ func (window *WindowImage) BoxAbs() structure.Box[int32] {
 		window.SizeAbsolute())
 }
 
+func (window *WindowImage) Compute() (err error) {
+	var (
+		parent   Window
+		full     structure.Vector2[float64]
+		position structure.Vector2[int32]
+		size     structure.Vector2[int32]
+	)
+
+	full = structure.NewVector2[float64](EngineWindowUnit, EngineWindowUnit)
+
+	window.
+		Node().
+		Prev().
+		IfPresent(func(value *structure.BinaryTreeNode[Window]) {
+			parent = value.Value()
+
+			position, size = parent.PositionAbsolute(), parent.SizeAbsolute()
+
+			position = window.
+				Position().ToFloat64().
+				Div(full).
+				Mul(size.ToFloat64()).
+				ToInt32().
+				Add(position)
+
+			size = window.
+				Size().ToFloat64().
+				Div(full).
+				Mul(size.ToFloat64()).
+				ToInt32()
+
+			window.SetPositionAbsolute(position)
+			window.SetSizeAbsolute(size)
+		})
+
+	return
+}
+
 func (window *WindowImage) Render() (err error) {
 	position := window.PositionAbsolute()
 	size := window.SizeAbsolute()
@@ -155,13 +193,6 @@ func (window *WindowImage) Render() (err error) {
 		rl.NewRectangle(0, 0, float32(size.X()), float32(size.Y())),
 		position.ToRaylib(),
 		window.Color().ToColor())
-
-	if window.Selected() {
-		rl.DrawRectangleLinesEx(
-			window.BoxAbs().ToRaylibRectangle(),
-			2,
-			rl.RayWhite)
-	}
 
 	return
 }

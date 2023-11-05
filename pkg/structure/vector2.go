@@ -100,3 +100,15 @@ func (vector Vector2[T]) Order(reversed bool) Vector2[T] {
 		return vector.Copy()
 	}
 }
+
+func (vector Vector2[T]) ToInt32() Vector2[int32] {
+	return NewVector2[int32](
+		vector.X(),
+		vector.Y())
+}
+
+func (vector Vector2[T]) ToFloat64() Vector2[float64] {
+	return NewVector2[float64](
+		vector.X(),
+		vector.Y())
+}

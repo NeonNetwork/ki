@@ -81,8 +81,7 @@ func (engine *Engine) WindowChildAdd(
 		node.SetValue(split)
 		split.SetNode(node)
 
-		previous := node.ChildAdd(window, window.Side())
-		window.SetNode(previous)
+		window.SetNode(node.ChildAdd(window, window.Side()))
 
 		result = node.ChildAdd(value, direction)
 	}
@@ -102,7 +101,6 @@ func (engine *Engine) WindowTreePrint() {
 func (engine *Engine) WindowTreePrintStep(node *structure.BinaryTreeNode[Window], level int, step int) {
 	window := node.Value()
 
-	fmt.Println()
 	fmt.Print(strings.Repeat(" ", level))
 	if window.Selected() {
 		fmt.Print("+")
@@ -110,9 +108,10 @@ func (engine *Engine) WindowTreePrintStep(node *structure.BinaryTreeNode[Window]
 		fmt.Print("-")
 	}
 	fmt.Printf(
-		"%s->%v[%v][%v]",
+		"%s->T=%v;R=%v;B=%v;A[%v]\n",
 		window.Id().String()[:4],
 		window.Type(),
+		window.IsRoot(),
 		window.Box(),
 		window.BoxAbs())
 
