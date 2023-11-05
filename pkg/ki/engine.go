@@ -76,7 +76,7 @@ func (engine *Engine) Init() *Engine {
 func (engine *Engine) Start() (err error) {
 	rl.SetConfigFlags(rl.FlagWindowResizable)
 
-	rl.SetTargetFPS(360)
+	rl.SetTargetFPS(60)
 
 	rl.InitWindow(1280, 720, "Ki [raylib]")
 	rl.HideCursor()

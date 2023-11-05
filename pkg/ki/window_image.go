@@ -2,6 +2,7 @@ package ki
 
 import (
 	"github.com/heartbytenet/bblib/objects"
+	"math/rand"
 	"os"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -134,7 +135,11 @@ func (window *WindowImage) Init() *WindowImage {
 	window.color = structure.NewVector3Random[byte](256)
 	window.texture = rl.LoadTexture(os.Getenv("TEXTURE"))
 
-	window.SetController(objects.Init[ControllerNumber[int]](&ControllerNumber[int]{}))
+	if (rand.Intn(100) % 2) == 0 {
+		window.SetController(objects.Init[ControllerNumber[int]](&ControllerNumber[int]{}))
+	} else {
+		window.SetController(objects.Init[ControllerGraph](&ControllerGraph{}))
+	}
 
 	return window
 }

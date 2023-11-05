@@ -35,7 +35,7 @@ func (controller *ControllerNumber[T]) Init() *ControllerNumber[T] {
 }
 
 func (controller *ControllerNumber[T]) Compute() (err error) {
-	controller.AddValue(127)
+	controller.AddValue(1)
 
 	return
 }
