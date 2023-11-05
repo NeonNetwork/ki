@@ -177,6 +177,14 @@ func (window *WindowSplit) Compute() (err error) {
 	return
 }
 
+func (window *WindowSplit) Controller() Controller {
+	return nil
+}
+
+func (window *WindowSplit) SetController(_ Controller) {
+	return
+}
+
 func (window *WindowSplit) Render() (err error) {
 	return
 }

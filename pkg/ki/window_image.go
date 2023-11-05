@@ -1,6 +1,7 @@
 package ki
 
 import (
+	"github.com/heartbytenet/bblib/objects"
 	"os"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -20,6 +21,8 @@ type WindowImage struct {
 	axis        WindowSplitAxis
 	selected    bool
 	color       structure.Vector3[uint8]
+
+	controller Controller
 
 	texture rl.Texture2D
 }
@@ -131,6 +134,8 @@ func (window *WindowImage) Init() *WindowImage {
 	window.color = structure.NewVector3Random[byte](256)
 	window.texture = rl.LoadTexture(os.Getenv("TEXTURE"))
 
+	window.SetController(objects.Init[ControllerNumber[int]](&ControllerNumber[int]{}))
+
 	return window
 }
 
@@ -181,6 +186,23 @@ func (window *WindowImage) Compute() (err error) {
 			window.SetSizeAbsolute(size)
 		})
 
+	err = window.Controller().Compute()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (window *WindowImage) Controller() Controller {
+	return window.controller
+}
+
+func (window *WindowImage) SetController(value Controller) {
+	window.controller = value
+
+	value.SetWindow(window)
+
 	return
 }
 
@@ -193,6 +215,11 @@ func (window *WindowImage) Render() (err error) {
 		rl.NewRectangle(0, 0, float32(size.X()), float32(size.Y())),
 		position.ToRaylib(),
 		window.Color().ToColor())
+
+	err = window.Controller().Render()
+	if err != nil {
+		return
+	}
 
 	return
 }

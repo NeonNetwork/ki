@@ -3,6 +3,8 @@ package ki
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/heartbytenet/bblib/containers/optionals"
+	"github.com/heartbytenet/bblib/objects"
+	"log"
 
 	"github.com/neonnetwork/ki/pkg/structure"
 )
@@ -11,11 +13,21 @@ const (
 	EngineWindowUnit = 1048576
 )
 
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+}
+
 type Engine struct {
+	graphics *Graphics
+
 	windows  *structure.BinaryTreeNode[Window]
 	selected *structure.BinaryTreeNode[Window]
 
 	windowsFloating []Window
+}
+
+func (engine *Engine) Graphics() *Graphics {
+	return engine.graphics
 }
 
 func (engine *Engine) WindowRoot() optionals.Optional[Window] {
@@ -51,6 +63,8 @@ func (engine *Engine) WindowSelectedNode() optionals.Optional[*structure.BinaryT
 }
 
 func (engine *Engine) Init() *Engine {
+	engine.graphics = objects.Init[Graphics](&Graphics{engine: engine})
+
 	engine.windows = nil
 	engine.selected = engine.windows
 
@@ -66,6 +80,11 @@ func (engine *Engine) Start() (err error) {
 
 	rl.InitWindow(1280, 720, "Ki [raylib]")
 	rl.HideCursor()
+
+	err = engine.graphics.Start()
+	if err != nil {
+		return
+	}
 
 	for engine.Running() {
 		err = engine.HandleInputs()

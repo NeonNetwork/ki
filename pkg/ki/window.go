@@ -45,6 +45,9 @@ type Window interface {
 	Box() structure.Box[int32]
 	BoxAbs() structure.Box[int32]
 
+	Controller() Controller
+	SetController(Controller)
+
 	Compute() error
 	Render() error
 }

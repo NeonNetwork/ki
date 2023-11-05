@@ -8,10 +8,12 @@ import (
 )
 
 func (engine *Engine) HandleInputs() (err error) {
-	defer engine.WindowTreePrint()
-
 	if rl.IsKeyPressed(rl.KeyF) {
 		rl.ToggleFullscreen()
+	}
+
+	if rl.IsKeyPressed(rl.KeyMinus) {
+		defer engine.WindowTreePrint()
 	}
 
 	if rl.IsKeyDown(rl.KeyLeftShift) {

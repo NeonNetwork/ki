@@ -17,6 +17,12 @@ func NewVector2[T Number, V Number](x V, y V) Vector2[T] {
 	}
 }
 
+func NewVector2FromRaylib[T Number](value rl.Vector2) Vector2[T] {
+	return NewVector2[T](
+		value.X,
+		value.Y)
+}
+
 func MapVector2[T Number, U Number](vector Vector2[T], fn func(T) U) Vector2[U] {
 	return NewVector2[U](
 		fn(vector.X()),
@@ -98,6 +104,22 @@ func (vector Vector2[T]) Order(reversed bool) Vector2[T] {
 		return vector.Rev()
 	} else {
 		return vector.Copy()
+	}
+}
+
+func (vector Vector2[T]) Max() T {
+	if vector.X() > vector.Y() {
+		return vector.X()
+	} else {
+		return vector.Y()
+	}
+}
+
+func (vector Vector2[T]) Min() T {
+	if vector.X() < vector.Y() {
+		return vector.X()
+	} else {
+		return vector.Y()
 	}
 }
 
