@@ -32,10 +32,14 @@ func (engine *Engine) Render() (err error) {
 }
 
 func (engine *Engine) RenderCursor() (err error) {
-	rl.DrawRectangleV(
-		engine.Cursor().Sub(structure.NewVector2[int32](8, 8)).ToRaylib(),
-		structure.NewVector2[int32](16, 16).ToRaylib(),
-		rl.RayWhite)
+	err = engine.Graphics().
+		DrawTextureVector(
+			engine.Graphics().textureCursor,
+			engine.Cursor().Sub(structure.NewVector2[int32](8, 8)),
+			structure.NewVector2[int32](16, 16))
+	if err != nil {
+		return
+	}
 
 	return
 }

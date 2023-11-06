@@ -1,13 +1,13 @@
 package ki
 
 import (
-	"math"
+	"github.com/neonnetwork/ki/pkg/structure"
 )
 
 type ControllerGraph struct {
 	ticks int64
 	value []float64
-	
+
 	ControllerBase
 }
 
@@ -23,13 +23,13 @@ func (controller *ControllerGraph) SetValue(value []float64) {
 
 func (controller *ControllerGraph) AddValue(value float64) {
 	controller.value = append(controller.value, value)
-	
+
 	return
 }
 
 func (controller *ControllerGraph) Init() *ControllerGraph {
 	controller.ControllerBase.Init()
-	
+
 	controller.value = make([]float64, 0)
 	controller.ticks = 0
 
@@ -37,12 +37,32 @@ func (controller *ControllerGraph) Init() *ControllerGraph {
 }
 
 func (controller *ControllerGraph) Compute() (err error) {
+	var (
+		value []float64
+	)
+
 	controller.ticks++
-	
-	controller.AddValue(math.Sin(float64(controller.ticks) / 60.0))
-	
-	if (int32(len(controller.Value())) * 2) > controller.Window().BoxAbs().Size().X() {
-		controller.value = controller.value[1:]
+
+	//	controller.AddValue(math.Sin(float64(controller.ticks) / 60.0))
+	//
+	//	if (int32(len(controller.Value())) * 2) > controller.Window().BoxAbs().Size().X() {
+	//		controller.value = controller.value[1:]
+	//	}
+
+	PoolGet[[]float64]("BINANCE_TICKER_HISTORY").IfPresent(func(cached *structure.Cached[[]float64]) {
+		value, err = cached.Get()
+		if err != nil {
+			return
+		}
+	})
+	if err != nil {
+		return
+	}
+
+	if len(value) > 1 {
+		controller.SetValue(value[1:])
+	} else {
+		controller.SetValue(value)
 	}
 
 	return

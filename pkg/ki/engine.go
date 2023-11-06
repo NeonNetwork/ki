@@ -3,8 +3,11 @@ package ki
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/heartbytenet/bblib/containers/optionals"
+	"github.com/heartbytenet/bblib/containers/sync"
 	"github.com/heartbytenet/bblib/objects"
+	"github.com/heartbytenet/go-lerpc/pkg/lerpc"
 	"log"
+	"os"
 
 	"github.com/neonnetwork/ki/pkg/structure"
 )
@@ -17,8 +20,18 @@ func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
+var (
+	ENGINE             *sync.Mutex[*Engine] = nil
+	RpcExecuteModeHttp                      = lerpc.ClientModeHttpOnly
+	RpcSecure          uint32               = 0
+)
+
 type Engine struct {
-	graphics *Graphics
+	client    *Client
+	rpcClient *lerpc.Client
+	pool      *Pool
+	graphics  *Graphics
+	logic     *Logic
 
 	windows  *structure.BinaryTreeNode[Window]
 	selected *structure.BinaryTreeNode[Window]
@@ -26,8 +39,24 @@ type Engine struct {
 	windowsFloating []Window
 }
 
+func (engine *Engine) Client() *Client {
+	return engine.client
+}
+
+func (engine *Engine) RpcClient() *lerpc.Client {
+	return engine.rpcClient
+}
+
+func (engine *Engine) Pool() *Pool {
+	return engine.pool
+}
+
 func (engine *Engine) Graphics() *Graphics {
 	return engine.graphics
+}
+
+func (engine *Engine) Logic() *Logic {
+	return engine.logic
 }
 
 func (engine *Engine) WindowRoot() optionals.Optional[Window] {
@@ -63,23 +92,43 @@ func (engine *Engine) WindowSelectedNode() optionals.Optional[*structure.BinaryT
 }
 
 func (engine *Engine) Init() *Engine {
+	engine.client = objects.Init[Client](&Client{})
+	engine.pool = objects.Init[Pool](&Pool{engine: engine})
 	engine.graphics = objects.Init[Graphics](&Graphics{engine: engine})
+	engine.logic = objects.Init[Logic](&Logic{engine: engine})
+
+	engine.rpcClient = (&lerpc.Client{}).Init("localhost:12000", "")
 
 	engine.windows = nil
 	engine.selected = engine.windows
 
 	engine.windowsFloating = make([]Window, 0)
 
+	ENGINE = sync.NewMutex(engine)
+
 	return engine
 }
 
 func (engine *Engine) Start() (err error) {
 	rl.SetConfigFlags(rl.FlagWindowResizable)
+	rl.SetConfigFlags(rl.FlagMsaa4xHint)
+	rl.SetConfigFlags(rl.FlagWindowAlwaysRun)
 
-	rl.SetTargetFPS(60)
+	if os.Getenv("VSYNC") != "" {
+		rl.SetConfigFlags(rl.FlagVsyncHint)
+	}
+
+	rl.SetTargetFPS(360)
 
 	rl.InitWindow(1280, 720, "Ki [raylib]")
 	rl.HideCursor()
+
+	engine.rpcClient.Mode(&RpcExecuteModeHttp)
+	engine.rpcClient.Secure(&RpcSecure)
+	err = engine.rpcClient.Start(0)
+	if err != nil {
+		return
+	}
 
 	err = engine.graphics.Start()
 	if err != nil {

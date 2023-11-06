@@ -46,6 +46,9 @@ func MinMax[T Number](values ...T) (T, T) {
 		return T(0.0), T(0.0)
 	}
 
+	vmin = values[0]
+	vmax = values[0]
+
 	for _, v := range values {
 		if v > vmax {
 			vmax = v

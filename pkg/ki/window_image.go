@@ -2,8 +2,6 @@ package ki
 
 import (
 	"github.com/heartbytenet/bblib/objects"
-	"math/rand"
-	"os"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/google/uuid"
@@ -24,8 +22,6 @@ type WindowImage struct {
 	color       structure.Vector3[uint8]
 
 	controller Controller
-
-	texture rl.Texture2D
 }
 
 func (window *WindowImage) Id() uuid.UUID {
@@ -130,13 +126,17 @@ func (window *WindowImage) SetSplitAxis(value WindowSplitAxis) {
 	return
 }
 
+var (
+	I = 0
+)
+
 func (window *WindowImage) Init() *WindowImage {
 	window.id = uuid.New()
 	window.color = structure.NewVector3Random[byte](256)
-	window.texture = rl.LoadTexture(os.Getenv("TEXTURE"))
 
-	if (rand.Intn(100) % 2) == 0 {
-		window.SetController(objects.Init[ControllerNumber[int]](&ControllerNumber[int]{}))
+	I++
+	if (I % 2) == 0 {
+		window.SetController(objects.Init[ControllerNumber[float64]](&ControllerNumber[float64]{}))
 	} else {
 		window.SetController(objects.Init[ControllerGraph](&ControllerGraph{}))
 	}
@@ -215,11 +215,13 @@ func (window *WindowImage) Render() (err error) {
 	position := window.PositionAbsolute()
 	size := window.SizeAbsolute()
 
-	rl.DrawTextureRec(
-		window.texture,
-		rl.NewRectangle(0, 0, float32(size.X()), float32(size.Y())),
-		position.ToRaylib(),
-		window.Color().ToColor())
+	GRAPHICS.Apply(func(graphics *Graphics) {
+		rl.DrawTextureRec(
+			graphics.textureWindow,
+			rl.NewRectangle(0, 0, float32(size.X()), float32(size.Y())),
+			position.ToRaylib(),
+			window.Color().ToColor())
+	})
 
 	err = window.Controller().Render()
 	if err != nil {
