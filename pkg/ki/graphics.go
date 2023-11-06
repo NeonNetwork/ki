@@ -111,11 +111,17 @@ func (graphics *Graphics) DrawGraph(value []float64, box structure.Box[int32]) (
 	}
 
 	for _, point := range points {
-		rl.DrawCircle(
-			box.Position().X()+point.X(),
-			box.Position().Y()+point.Y(),
+		rl.DrawLineEx(
+			box.Position().Add(point.Mul(structure.NewVector2[int32](1, 1))).Add(box.Size().Mul(structure.NewVector2[int32](0, 1))).ToRaylib(),
+			box.Position().Add(point.Mul(structure.NewVector2[int32](1, 1))).ToRaylib(),
 			2.0,
 			rl.RayWhite)
+
+		//		rl.DrawCircle(
+		//			box.Position().X()+point.X(),
+		//			box.Position().Y()+point.Y(),
+		//			2.0,
+		//			rl.RayWhite)
 	}
 
 	return

@@ -1,13 +1,14 @@
 package ki
 
 import (
+	"log"
+	"os"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/heartbytenet/bblib/containers/optionals"
 	"github.com/heartbytenet/bblib/containers/sync"
 	"github.com/heartbytenet/bblib/objects"
 	"github.com/heartbytenet/go-lerpc/pkg/lerpc"
-	"log"
-	"os"
 
 	"github.com/neonnetwork/ki/pkg/structure"
 )
@@ -113,6 +114,7 @@ func (engine *Engine) Start() (err error) {
 	rl.SetConfigFlags(rl.FlagWindowResizable)
 	rl.SetConfigFlags(rl.FlagMsaa4xHint)
 	rl.SetConfigFlags(rl.FlagWindowAlwaysRun)
+	rl.SetConfigFlags(rl.FlagWindowHighdpi)
 
 	if os.Getenv("VSYNC") != "" {
 		rl.SetConfigFlags(rl.FlagVsyncHint)
