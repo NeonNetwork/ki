@@ -59,11 +59,11 @@ func (controller *ControllerGraph) Compute() (err error) {
 		return
 	}
 
-	if len(value) > 1 {
-		controller.SetValue(value[1:])
-	} else {
-		controller.SetValue(value)
+	for int32(len(value)) > controller.Window().BoxAbs().W() {
+		value = value[1:]
 	}
+
+	controller.SetValue(value)
 
 	return
 }

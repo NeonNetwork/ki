@@ -72,8 +72,13 @@ func (cached *Cached[T]) Tick() {
 
 func (cached *Cached[T]) Get() (result T, err error) {
 	if !cached.Alive() {
-		cached.Tick()
-		go cached.Update()
+		if cached.last.Get() == 0 {
+			cached.Tick()
+			cached.Update()
+		} else {
+			cached.Tick()
+			go cached.Update()
+		}
 	}
 
 	cached.value.Apply(func(value T) {

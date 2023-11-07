@@ -84,7 +84,7 @@ func (pool *Pool) Init() *Pool {
 				}
 
 				result = append(result, value)
-				if len(result) > 3600 {
+				for len(result) > 7200 {
 					result = result[1:]
 				}
 
