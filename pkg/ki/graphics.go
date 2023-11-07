@@ -105,23 +105,23 @@ func (graphics *Graphics) DrawGraph(value []float64, box structure.Box[int32]) (
 
 	for i, v := range value {
 		pointX := float64(i) / float64(len(value)) * box.Size().ToFloat64().X()
-		pointY := (v - valueMin) / (valueMax - valueMin) * box.Size().ToFloat64().Y()
+		pointY := (1.0 - (v - valueMin) / (valueMax - valueMin)) * box.Size().ToFloat64().Y()
 
 		points = append(points, structure.NewVector2[int32](pointX, pointY))
 	}
 
 	for _, point := range points {
 		rl.DrawLineEx(
-			box.Position().Add(point.Mul(structure.NewVector2[int32](1, 1))).Add(box.Size().Mul(structure.NewVector2[int32](0, 1))).ToRaylib(),
+			box.Position().Add(point.Mul(structure.NewVector2[int32](1, 0))).Add(box.Size().Mul(structure.NewVector2[int32](0, 1))).ToRaylib(),
 			box.Position().Add(point.Mul(structure.NewVector2[int32](1, 1))).ToRaylib(),
 			2.0,
 			rl.RayWhite)
 
-		//		rl.DrawCircle(
-		//			box.Position().X()+point.X(),
-		//			box.Position().Y()+point.Y(),
-		//			2.0,
-		//			rl.RayWhite)
+//		rl.DrawCircle(
+//			box.Position().X()+point.X(),
+//			box.Position().Y()+point.Y(),
+//			2.0,
+//			rl.RayWhite)
 	}
 
 	return

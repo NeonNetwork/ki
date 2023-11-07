@@ -59,7 +59,7 @@ func (pool *Pool) Init() *Pool {
 
 				return
 			},
-			5000))
+			1000))
 
 	PoolRegister(
 		"BINANCE_TICKER_HISTORY",
@@ -90,7 +90,7 @@ func (pool *Pool) Init() *Pool {
 
 				return
 			},
-			5000))
+			1000))
 
 	return pool
 }

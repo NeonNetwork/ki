@@ -76,7 +76,7 @@ func (server *Server) HandleDataPull(cmd *proto.ExecuteCommand, res *proto.Execu
 	case "BINANCE_PRICE":
 		{
 			err = server.client.HttpGetJson(
-				"https://api.binance.com/api/v3/avgPrice?symbol=ETHUSDT",
+				"https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT",
 				&result)
 			if err != nil {
 				res.ToError("failed at fetching price json: " + err.Error())
