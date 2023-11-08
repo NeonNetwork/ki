@@ -16,6 +16,13 @@ func (engine *Engine) HandleInputs() (err error) {
 		defer engine.WindowTreePrint()
 	}
 
+	if rl.IsKeyPressed(rl.KeyZ) {
+		err = engine.Screenshot()
+		if err != nil {
+			return
+		}
+	}
+
 	if rl.IsKeyDown(rl.KeyLeftShift) {
 		if rl.IsKeyPressed(rl.KeyJ) {
 			engine.WindowSelectedNode().

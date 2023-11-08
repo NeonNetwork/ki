@@ -1,8 +1,10 @@
 package ki
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/heartbytenet/bblib/containers/optionals"
@@ -181,4 +183,15 @@ func (engine *Engine) Cursor() structure.Vector2[int32] {
 	return structure.NewVector2[int32](
 		rl.GetMouseX(),
 		rl.GetMouseY())
+}
+
+func (engine *Engine) Screenshot() (err error) {
+	err = os.MkdirAll("./data/screenshots/", 0755)
+	if err != nil {
+		return
+	}
+
+	rl.TakeScreenshot(fmt.Sprintf("./data/screenshots/%v.png", time.Now().UnixMilli()))
+
+	return
 }
