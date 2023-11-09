@@ -128,6 +128,7 @@ func (window *WindowImage) SetSplitAxis(value WindowSplitAxis) {
 
 var (
 	I = 0
+	W = []string{"N", "G", "P"}
 )
 
 func (window *WindowImage) Init() *WindowImage {
@@ -135,10 +136,22 @@ func (window *WindowImage) Init() *WindowImage {
 	window.color = structure.NewVector3Random[byte](256)
 
 	I++
-	if (I % 2) == 0 {
-		window.SetController(objects.Init[ControllerNumber[float64]](&ControllerNumber[float64]{}))
-	} else {
-		window.SetController(objects.Init[ControllerGraph](&ControllerGraph{}))
+	switch W[I%len(W)] {
+	case "N":
+		{
+			window.SetController(objects.Init[ControllerNumber[float64]](&ControllerNumber[float64]{}))
+			break
+		}
+	case "G":
+		{
+			window.SetController(objects.Init[ControllerGraph](&ControllerGraph{}))
+			break
+		}
+	case "P":
+		{
+			window.SetController(objects.Init[ControllerPie](&ControllerPie{}))
+			break
+		}
 	}
 
 	return window

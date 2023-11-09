@@ -7,6 +7,7 @@ import (
 	"github.com/neonnetwork/ki/pkg/structure"
 	"log"
 	"reflect"
+	"sort"
 )
 
 var (
@@ -73,6 +74,108 @@ func (pool *Pool) Init() *Pool {
 				result = previous
 
 				PoolGet[float64]("BINANCE_TICKER_VALUE").
+					IfPresent(func(cached *structure.Cached[float64]) {
+						value, err = cached.Get()
+						if err != nil {
+							return
+						}
+					})
+				if err != nil {
+					return
+				}
+
+				result = append(result, value)
+				for len(result) > 7200 {
+					result = result[1:]
+				}
+
+				return
+			},
+			1000))
+
+	PoolRegister(
+		"RESOURCE_CPU",
+		structure.NewCached[float64](
+			0.0,
+			func(_ float64) (value float64, err error) {
+				var (
+					data any
+					flag bool
+				)
+
+				ENGINE.Apply(func(engine *Engine) {
+					data, err = engine.Logic().RpcDataPull("RESOURCE_CPU")
+					if err != nil {
+						return
+					}
+				})
+				if err != nil {
+					return
+				}
+
+				value, flag = data.(float64)
+				if !flag {
+					err = fmt.Errorf(
+						"failed at converting %v -> %v",
+						reflect.TypeOf(data),
+						reflect.TypeOf(value))
+					return
+				}
+
+				return
+			},
+			1000))
+
+	PoolRegister(
+		"RESOURCE_TOP",
+		structure.NewCached[[]structure.Pair[string, float64]](
+			nil,
+			func(prev []structure.Pair[string, float64]) (result []structure.Pair[string, float64], err error) {
+				var (
+					data any
+				)
+
+				result = make([]structure.Pair[string, float64], 0)
+
+				ENGINE.Apply(func(engine *Engine) {
+					data, err = engine.Logic().RpcDataPull("RESOURCE_TOP")
+					if err != nil {
+						return
+					}
+				})
+				if err != nil {
+					return
+				}
+
+				for key, val := range data.(map[string]any) {
+					value, ok := val.(float64)
+					if !ok {
+						continue
+					}
+
+					result = append(result, structure.NewPair(key, value))
+				}
+
+				sort.Slice(result, func(i, j int) bool {
+					return result[i].B() > result[j].B()
+				})
+
+				return
+			},
+			1000))
+
+	PoolRegister(
+		"RESOURCE_CPU_HISTORY",
+		structure.NewCached[[]float64](
+			make([]float64, 0),
+			func(previous []float64) (result []float64, err error) {
+				var (
+					value float64
+				)
+
+				result = previous
+
+				PoolGet[float64]("RESOURCE_CPU").
 					IfPresent(func(cached *structure.Cached[float64]) {
 						value, err = cached.Get()
 						if err != nil {

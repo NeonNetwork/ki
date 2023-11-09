@@ -48,6 +48,11 @@ func (box Box[T]) Size() Vector2[T] {
 	return box.size
 }
 
+func (box Box[T]) Center() Vector2[T] {
+	return box.Position().
+		Add(box.Size().Div(NewVector2[T](2, 2)))
+}
+
 func (box Box[T]) CollisionPoint(point Vector2[T]) (result bool) {
 	if point.X() < box.X() {
 		result = false

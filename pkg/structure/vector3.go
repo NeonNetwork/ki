@@ -12,11 +12,11 @@ type Vector3[T Number] struct {
 	z T
 }
 
-func NewVector3[T Number](x T, y T, z T) Vector3[T] {
+func NewVector3[T Number, V Number](x V, y V, z V) Vector3[T] {
 	return Vector3[T]{
-		x: x,
-		y: y,
-		z: z,
+		x: T(x),
+		y: T(y),
+		z: T(z),
 	}
 }
 

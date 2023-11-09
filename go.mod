@@ -3,9 +3,9 @@ module github.com/neonnetwork/ki
 go 1.21.1
 
 require (
-	github.com/gen2brain/raylib-go/raylib v0.0.0-20231108191656-f75cc390781e
+	github.com/gen2brain/raylib-go/raylib v0.0.0-20231109133233-d0612c27b2b4
 	github.com/heartbytenet/bblib v0.0.0-20230704141714-50a45df821ae
-	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
+	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678
 )
 
 require (
@@ -28,6 +28,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.50.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/net v0.18.0 // indirect
 	golang.org/x/sys v0.14.0 // indirect
 )

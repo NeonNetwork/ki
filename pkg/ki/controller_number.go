@@ -35,7 +35,7 @@ func (controller *ControllerNumber[T]) Init() *ControllerNumber[T] {
 }
 
 func (controller *ControllerNumber[T]) Compute() (err error) {
-	controller.SetValue(T(PoolGet[float64]("BINANCE_TICKER_VALUE").Get().GetMust()))
+	controller.SetValue(T(PoolGet[float64]("RESOURCE_CPU").Get().GetMust()))
 
 	return
 }

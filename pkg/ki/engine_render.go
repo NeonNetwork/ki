@@ -26,7 +26,9 @@ func (engine *Engine) Render() (err error) {
 		return
 	}
 
-	rl.DrawFPS(8, 8)
+	if engine.fpsDisplay {
+		rl.DrawFPS(8, 8)
+	}
 
 	return
 }

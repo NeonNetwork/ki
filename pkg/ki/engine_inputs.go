@@ -23,6 +23,10 @@ func (engine *Engine) HandleInputs() (err error) {
 		}
 	}
 
+	if rl.IsKeyPressed(rl.KeyQ) {
+		engine.fpsDisplay = !engine.fpsDisplay
+	}
+
 	if rl.IsKeyDown(rl.KeyLeftShift) {
 		if rl.IsKeyPressed(rl.KeyJ) {
 			engine.WindowSelectedNode().

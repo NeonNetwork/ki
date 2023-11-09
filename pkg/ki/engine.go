@@ -40,6 +40,8 @@ type Engine struct {
 	selected *structure.BinaryTreeNode[Window]
 
 	windowsFloating []Window
+
+	fpsDisplay bool
 }
 
 func (engine *Engine) Client() *Client {
@@ -106,6 +108,8 @@ func (engine *Engine) Init() *Engine {
 	engine.selected = engine.windows
 
 	engine.windowsFloating = make([]Window, 0)
+
+	engine.fpsDisplay = false
 
 	ENGINE = sync.NewMutex(engine)
 

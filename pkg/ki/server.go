@@ -93,6 +93,56 @@ func (server *Server) HandleDataPull(cmd *proto.ExecuteCommand, res *proto.Execu
 				"value": value,
 			}
 		}
+	case "BINANCE_ORDERS":
+		{
+			err = server.client.HttpGetJson(
+				"https://api.binance.com/api/v3/depth?symbol=ETHUSDT",
+				&result)
+			if err != nil {
+				res.ToError("failed at fetching depth json: " + err.Error())
+				return
+			}
+
+			transform := func(data []any) ([]any, error) { // Todo: this is ugly
+				r := make([]any, 0)
+
+				for _, v := range data {
+					vv := v.([]any)
+					a, e := strconv.ParseFloat(vv[0].(string), 64)
+					if e != nil {
+						return nil, e
+					}
+
+					b, e := strconv.ParseFloat(vv[1].(string), 64)
+					if e != nil {
+						return nil, e
+					}
+
+					r = append(r, []float64{a, b})
+				}
+
+				return r, nil
+			}
+
+			bids, e := transform(result["bids"].([]any))
+			if e != nil {
+				err = e
+				return
+			}
+
+			asks, e := transform(result["asks"].([]any))
+			if e != nil {
+				err = e
+				return
+			}
+
+			result = map[string]any{
+				"value": map[string]any{
+					"bids": bids,
+					"asks": asks,
+				},
+			}
+		}
 	default:
 		{
 			break

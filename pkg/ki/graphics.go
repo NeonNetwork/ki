@@ -73,6 +73,18 @@ func (graphics *Graphics) DrawTextureVector(
 	return
 }
 
+func (graphics *Graphics) DrawText(value string, pos structure.Vector2[int32], fontSize float64) (err error) {
+	rl.DrawTextEx(
+		graphics.Font(),
+		value,
+		pos.ToRaylib(),
+		float32(fontSize),
+		0.0,
+		rl.RayWhite)
+
+	return
+}
+
 func (graphics *Graphics) DrawTextCentered(value string, box structure.Box[int32]) (err error) {
 	textData := value
 	fontSize := float32(box.Size().Min()) / float32(len(textData)) * 1.5
@@ -105,7 +117,7 @@ func (graphics *Graphics) DrawGraph(value []float64, box structure.Box[int32]) (
 
 	for i, v := range value {
 		pointX := float64(i) / float64(len(value)) * box.Size().ToFloat64().X()
-		pointY := (1.0 - (v - valueMin) / (valueMax - valueMin)) * box.Size().ToFloat64().Y()
+		pointY := (1.0 - (v-valueMin)/(valueMax-valueMin)) * box.Size().ToFloat64().Y()
 
 		points = append(points, structure.NewVector2[int32](pointX, pointY))
 	}
@@ -117,12 +129,29 @@ func (graphics *Graphics) DrawGraph(value []float64, box structure.Box[int32]) (
 			2.0,
 			rl.RayWhite)
 
-//		rl.DrawCircle(
-//			box.Position().X()+point.X(),
-//			box.Position().Y()+point.Y(),
-//			2.0,
-//			rl.RayWhite)
+		//		rl.DrawCircle(
+		//			box.Position().X()+point.X(),
+		//			box.Position().Y()+point.Y(),
+		//			2.0,
+		//			rl.RayWhite)
 	}
+
+	return
+}
+
+func (graphics *Graphics) DrawCircleSector(
+	pos structure.Vector2[int32],
+	radius float64,
+	angles structure.Pair[float64, float64],
+	color structure.Vector3[uint8],
+) (err error) {
+	rl.DrawCircleSector(
+		pos.ToRaylib(),
+		float32(radius),
+		float32(angles.A()),
+		float32(angles.B()),
+		32,
+		color.ToColor())
 
 	return
 }
