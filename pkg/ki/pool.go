@@ -30,7 +30,7 @@ func (pool *Pool) Init() *Pool {
 	POOL = sync.NewMutex(pool)
 
 	PoolRegister(
-		"BINANCE_TICKER_VALUE",
+		"BINANCE_PRICE",
 		structure.NewCached[float64](
 			0.0,
 			func(_ float64) (value float64, err error) {
@@ -63,7 +63,7 @@ func (pool *Pool) Init() *Pool {
 			1000))
 
 	PoolRegister(
-		"BINANCE_TICKER_HISTORY",
+		"BINANCE_PRICE_HISTORY",
 		structure.NewCached[[]float64](
 			make([]float64, 0),
 			func(previous []float64) (result []float64, err error) {
@@ -73,7 +73,7 @@ func (pool *Pool) Init() *Pool {
 
 				result = previous
 
-				PoolGet[float64]("BINANCE_TICKER_VALUE").
+				PoolGet[float64]("BINANCE_PRICE").
 					IfPresent(func(cached *structure.Cached[float64]) {
 						value, err = cached.Get()
 						if err != nil {

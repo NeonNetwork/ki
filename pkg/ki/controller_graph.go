@@ -2,6 +2,7 @@ package ki
 
 import (
 	"github.com/neonnetwork/ki/pkg/structure"
+	"os"
 )
 
 type ControllerGraph struct {
@@ -43,15 +44,30 @@ func (controller *ControllerGraph) Compute() (err error) {
 
 	controller.ticks++
 
-	PoolGet[[]float64]("RESOURCE_CPU_HISTORY").
-		IfPresent(func(cached *structure.Cached[[]float64]) {
-			value, err = cached.Get()
-			if err != nil {
-				return
-			}
-		})
-	if err != nil {
-		return
+	if os.Getenv("KI_SETUP") == "BINANCE" {
+		PoolGet[[]float64]("BINANCE_PRICE_HISTORY").
+			IfPresent(func(cached *structure.Cached[[]float64]) {
+				value, err = cached.Get()
+				if err != nil {
+					return
+				}
+			})
+
+		if err != nil {
+			return
+		}
+	} else {
+		PoolGet[[]float64]("RESOURCE_CPU_HISTORY").
+			IfPresent(func(cached *structure.Cached[[]float64]) {
+				value, err = cached.Get()
+				if err != nil {
+					return
+				}
+			})
+
+		if err != nil {
+			return
+		}
 	}
 
 	for int32(len(value)) > (controller.Window().BoxAbs().W() / 8) {

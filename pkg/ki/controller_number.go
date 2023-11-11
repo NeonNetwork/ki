@@ -2,6 +2,7 @@ package ki
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/neonnetwork/ki/pkg/structure"
 )
@@ -35,7 +36,11 @@ func (controller *ControllerNumber[T]) Init() *ControllerNumber[T] {
 }
 
 func (controller *ControllerNumber[T]) Compute() (err error) {
-	controller.SetValue(T(PoolGet[float64]("RESOURCE_CPU").Get().GetMust()))
+	if os.Getenv("KI_SETUP") == "BINANCE" {
+		controller.SetValue(T(PoolGet[float64]("BINANCE_PRICE").Get().GetMust()))
+	} else {
+		controller.SetValue(T(PoolGet[float64]("RESOURCE_CPU").Get().GetMust()))
+	}
 
 	return
 }

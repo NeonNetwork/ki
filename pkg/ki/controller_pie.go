@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/neonnetwork/ki/pkg/structure"
 	"math"
+	"os"
 )
 
 type ControllerPie struct {
@@ -29,10 +30,14 @@ func (controller *ControllerPie) Init() *ControllerPie {
 }
 
 func (controller *ControllerPie) Compute() (err error) {
-	PoolGet[[]structure.Pair[string, float64]]("RESOURCE_TOP").
-		IfPresent(func(cached *structure.Cached[[]structure.Pair[string, float64]]) {
-			controller.SetValue(cached.GetMust())
-		})
+	if os.Getenv("KI_SETUP") == "BINANCE" {
+		controller.SetValue(make([]structure.Pair[string, float64], 0))
+	} else {
+		PoolGet[[]structure.Pair[string, float64]]("RESOURCE_TOP").
+			IfPresent(func(cached *structure.Cached[[]structure.Pair[string, float64]]) {
+				controller.SetValue(cached.GetMust())
+			})
+	}
 
 	return
 }

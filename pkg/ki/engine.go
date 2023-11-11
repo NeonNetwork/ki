@@ -126,7 +126,7 @@ func (engine *Engine) Start() (err error) {
 		rl.SetConfigFlags(rl.FlagVsyncHint)
 	}
 
-	rl.SetTargetFPS(360)
+	rl.SetTargetFPS(120)
 
 	rl.InitWindow(1280, 720, "Ki [raylib]")
 	rl.HideCursor()

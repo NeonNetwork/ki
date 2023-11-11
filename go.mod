@@ -3,9 +3,9 @@ module github.com/neonnetwork/ki
 go 1.21.1
 
 require (
-	github.com/gen2brain/raylib-go/raylib v0.0.0-20231109133233-d0612c27b2b4
+	github.com/gen2brain/raylib-go/raylib v0.0.0-20231110110915-a4ea6d49d9e5
 	github.com/heartbytenet/bblib v0.0.0-20230704141714-50a45df821ae
-	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678
+	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa
 )
 
 require (
