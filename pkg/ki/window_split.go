@@ -15,6 +15,7 @@ type WindowSplit struct {
 	size        structure.Vector2[int32]
 	sizeAbs     structure.Vector2[int32]
 	axis        WindowSplitAxis
+	color       structure.Vector3[uint8]
 	selected    bool
 }
 
@@ -72,6 +73,16 @@ func (window *WindowSplit) PositionAbsolute() structure.Vector2[int32] {
 
 func (window *WindowSplit) SetPositionAbsolute(value structure.Vector2[int32]) {
 	window.positionAbs = value
+
+	return
+}
+
+func (window *WindowSplit) Color() structure.Vector3[uint8] {
+	return window.color
+}
+
+func (window *WindowSplit) SetColor(value structure.Vector3[uint8]) {
+	window.color = value
 
 	return
 }

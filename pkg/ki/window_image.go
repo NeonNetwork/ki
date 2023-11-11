@@ -106,6 +106,12 @@ func (window *WindowImage) Color() structure.Vector3[uint8] {
 	return window.color
 }
 
+func (window *WindowImage) SetColor(value structure.Vector3[uint8]) {
+	window.color = value
+
+	return
+}
+
 func (window *WindowImage) Selected() bool {
 	return window.selected
 }
@@ -128,7 +134,7 @@ func (window *WindowImage) SetSplitAxis(value WindowSplitAxis) {
 
 var (
 	I = 0
-	W = []string{"N", "G", "P"}
+	W = []string{"N", "G", "P", "L"}
 )
 
 func (window *WindowImage) Init() *WindowImage {
@@ -150,6 +156,11 @@ func (window *WindowImage) Init() *WindowImage {
 	case "P":
 		{
 			window.SetController(objects.Init[ControllerPie](&ControllerPie{}))
+			break
+		}
+	case "L":
+		{
+		window.SetController(objects.Init[ControllerList](&ControllerList{}))
 			break
 		}
 	}

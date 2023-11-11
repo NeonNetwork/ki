@@ -41,6 +41,8 @@ type Window interface {
 	SetSplitAxis(axis WindowSplitAxis)
 	Selected() bool
 	SetSelected(bool)
+	Color() structure.Vector3[uint8]
+	SetColor(structure.Vector3[uint8])
 
 	Box() structure.Box[int32]
 	BoxAbs() structure.Box[int32]

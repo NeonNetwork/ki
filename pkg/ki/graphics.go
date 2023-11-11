@@ -4,6 +4,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/heartbytenet/bblib/containers/sync"
 	"github.com/neonnetwork/ki/pkg/structure"
+	"image/color"
 	"log"
 )
 
@@ -152,6 +153,17 @@ func (graphics *Graphics) DrawCircleSector(
 		float32(angles.B()),
 		32,
 		color.ToColor())
+
+	return
+}
+
+func (graphics *Graphics) DrawRectangle(box structure.Box[int32], color color.RGBA) (err error) {
+	rl.DrawRectangle(
+		box.X(),
+		box.Y(),
+		box.W(),
+		box.H(),
+		color)
 
 	return
 }
