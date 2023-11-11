@@ -8,6 +8,7 @@ import (
 	"log"
 	"reflect"
 	"sort"
+	"time"
 )
 
 var (
@@ -194,6 +195,25 @@ func (pool *Pool) Init() *Pool {
 				return
 			},
 			1000))
+
+	PoolRegister(
+		"TEXT_LIST_DATA",
+		structure.NewCached[[]string](
+			make([]string, 0),
+			func(previous []string) (result []string, err error) {
+				result = previous
+
+				value := fmt.Sprintf("Timestamp=%v", time.Now().Unix())
+
+				result = append(result, value)
+
+				for len(result) > 1024 {
+					result = result[:len(result) - 1]
+				}
+
+				return
+			},
+			500))
 
 	return pool
 }

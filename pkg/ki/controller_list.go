@@ -1,7 +1,6 @@
 package ki
 
 import (
-	"fmt"
 	"github.com/heartbytenet/bblib/containers/optionals"
 	"github.com/neonnetwork/ki/pkg/structure"
 )
@@ -40,13 +39,11 @@ func (controller *ControllerList) Init() *ControllerList {
 }
 
 func (controller *ControllerList) Compute() (err error) {
-	v := make([]string, 0)
-	
-	for i := 0; i < 50; i++ {
-		v = append(v, fmt.Sprintf("List Element #%v", i))
-	}
-	
-	controller.SetValue(v)
+	PoolGet[[]string]("TEXT_LIST_DATA").IfPresent(func(cache *structure.Cached[[]string]) {
+		value := cache.GetMust()
+
+		controller.SetValue(value)
+	})
 	
 	if controller.textColor.IsEmpty() {
 		controller.textColor = optionals.Some[structure.Vector3[uint8]](
@@ -69,8 +66,13 @@ func (controller *ControllerList) Render() (err error) {
 	
 	textSize := int32(32)
 	textLen  := box.H() / textSize
+
 	textData := controller.Value()
-	
+	for len(controller.Value()) > int(textLen) {
+		controller.SetValue(textData[1:])
+		textData = controller.Value()
+	}
+
 	if len(textData) > int(textLen) {
 		textData = textData[:textLen]
 	}
@@ -85,10 +87,11 @@ func (controller *ControllerList) Render() (err error) {
 	}
 	
 	GRAPHICS.Apply(func(graphics *Graphics) {
+		vEnd  := box.Position().Add(box.Size().Mul(structure.NewVector2[int32](0, 1)))
 		delta := structure.NewVector2[int32](0, 0)
 		
 		for index, value := range textData {
-			vPos  := box.Position().Add(delta)
+			vPos  := vEnd.Sub(delta)
 			vSize := structure.NewVector2[int32](box.W(), 32)
 			
 			textBoxColor := colorX
@@ -104,7 +107,7 @@ func (controller *ControllerList) Render() (err error) {
 			}
 			
 			err = graphics.DrawText(
-				value,
+				textData[len(textData) - 1 - index],
 				vPos,
 				32.0)
 			if err != nil {
