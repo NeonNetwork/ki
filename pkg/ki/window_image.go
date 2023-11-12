@@ -161,7 +161,7 @@ func (window *WindowImage) Init() *WindowImage {
 		}
 	case "L":
 		{
-		window.SetController(objects.Init[ControllerList](&ControllerList{}))
+			window.SetController(objects.Init[ControllerList](&ControllerList{}))
 			break
 		}
 	}

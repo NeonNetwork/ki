@@ -89,7 +89,7 @@ func (controller *ControllerGraph) Compute() (err error) {
 
 	cursorY := controller.Window().BoxAbs().H() - cursor.Y()
 
-	controller.valueYline = controller.valueYmin + (controller.valueYmax - controller.valueYmin) * (float64(cursorY) / float64(controller.Window().BoxAbs().H()))
+	controller.valueYline = controller.valueYmin + (controller.valueYmax-controller.valueYmin)*(float64(cursorY)/float64(controller.Window().BoxAbs().H()))
 
 	return
 }
@@ -126,7 +126,13 @@ func (controller *ControllerGraph) Render() (err error) {
 			return
 		}
 
-		rl.DrawText(fmt.Sprintf("%0.4f", controller.valueYline), rl.GetMouseX() + 8, rl.GetMouseY() + 8, 32.0, rl.RayWhite)
+		err = graphics.DrawText(
+			fmt.Sprintf("%0.4f", controller.valueYline),
+			box.Position().Add(cursor).Add(structure.NewVector2[int32](8, 8)),
+			32.0)
+		if err != nil {
+			return
+		}
 	})
 	if err != nil {
 		return

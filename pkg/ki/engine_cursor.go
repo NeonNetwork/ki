@@ -7,16 +7,16 @@ func (engine *Engine) HandleCursor() (err error) {
 
 	err = engine.WindowListWalkNode(func(node *structure.BinaryTreeNode[Window]) error {
 		window := node.Value()
-		
+
 		box := window.BoxAbs()
-		
+
 		window.SetCursorPosition(cursor.Sub(box.Position()))
-		
+
 		return nil
 	})
 	if err != nil {
 		return
 	}
-	
+
 	return
 }

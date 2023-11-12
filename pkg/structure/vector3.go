@@ -73,23 +73,23 @@ func (vector Vector3[T]) Copy() Vector3[T] {
 
 func (vector Vector3[T]) Add(value Vector3[T]) Vector3[T] {
 	return NewVector3[T](
-		vector.X() + value.X(),
-		vector.Y() + value.Y(),
-		vector.Z() + value.Z())
+		vector.X()+value.X(),
+		vector.Y()+value.Y(),
+		vector.Z()+value.Z())
 }
 
 func (vector Vector3[T]) Sub(value Vector3[T]) Vector3[T] {
 	return NewVector3[T](
-		vector.X() - value.X(),
-		vector.Y() - value.Y(),
-		vector.Z() - value.Z())
+		vector.X()-value.X(),
+		vector.Y()-value.Y(),
+		vector.Z()-value.Z())
 }
 
 func (vector Vector3[T]) Mul(value Vector3[T]) Vector3[T] {
 	return NewVector3[T](
-		vector.X() * value.X(),
-		vector.Y() * value.Y(),
-		vector.Z() * value.Z())
+		vector.X()*value.X(),
+		vector.Y()*value.Y(),
+		vector.Z()*value.Z())
 }
 
 func (vector Vector3[T]) Div(value Vector3[T]) Vector3[T] {
@@ -126,4 +126,3 @@ func (vector Vector3[T]) ToFloat64() Vector3[float64] {
 		vector.Y(),
 		vector.Z())
 }
-
