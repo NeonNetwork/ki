@@ -20,6 +20,7 @@ type WindowImage struct {
 	axis        WindowSplitAxis
 	selected    bool
 	color       structure.Vector3[uint8]
+	cursor      structure.Vector2[int32]
 
 	controller Controller
 }
@@ -178,6 +179,16 @@ func (window *WindowImage) BoxAbs() structure.Box[int32] {
 	return structure.NewBox[int32](
 		window.PositionAbsolute(),
 		window.SizeAbsolute())
+}
+
+func (window *WindowImage) CursorPosition() structure.Vector2[int32] {
+	return window.cursor
+}
+
+func (window *WindowImage) SetCursorPosition(value structure.Vector2[int32]) {
+	window.cursor = value
+
+	return
 }
 
 func (window *WindowImage) Compute() (err error) {

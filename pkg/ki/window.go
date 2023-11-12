@@ -47,6 +47,9 @@ type Window interface {
 	Box() structure.Box[int32]
 	BoxAbs() structure.Box[int32]
 
+	CursorPosition() structure.Vector2[int32]
+	SetCursorPosition(structure.Vector2[int32])
+
 	Controller() Controller
 	SetController(Controller)
 

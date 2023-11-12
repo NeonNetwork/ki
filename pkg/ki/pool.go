@@ -208,7 +208,7 @@ func (pool *Pool) Init() *Pool {
 				result = append(result, value)
 
 				for len(result) > 1024 {
-					result = result[:len(result) - 1]
+					result = result[1:]
 				}
 
 				return

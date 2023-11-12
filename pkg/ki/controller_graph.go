@@ -1,6 +1,8 @@
 package ki
 
 import (
+	"fmt"
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/neonnetwork/ki/pkg/structure"
 	"os"
 )
@@ -8,6 +10,10 @@ import (
 type ControllerGraph struct {
 	ticks int64
 	value []float64
+
+	valueYmin  float64
+	valueYmax  float64
+	valueYline float64
 
 	ControllerBase
 }
@@ -76,17 +82,51 @@ func (controller *ControllerGraph) Compute() (err error) {
 
 	controller.SetValue(value)
 
+	controller.valueYmin, controller.valueYmax = structure.MinMax[float64](value...)
+
+	// Compute mouse
+	cursor := controller.Window().CursorPosition()
+
+	cursorY := controller.Window().BoxAbs().H() - cursor.Y()
+
+	controller.valueYline = controller.valueYmin + (controller.valueYmax - controller.valueYmin) * (float64(cursorY) / float64(controller.Window().BoxAbs().H()))
+
 	return
 }
 
 func (controller *ControllerGraph) Render() (err error) {
+	box := controller.Window().BoxAbs()
+	cursor := controller.Window().CursorPosition()
+
 	GRAPHICS.Apply(func(graphics *Graphics) {
 		err = graphics.DrawGraph(
 			controller.Value(),
+			controller.valueYmin,
+			controller.valueYmax,
 			controller.Window().BoxAbs())
 		if err != nil {
 			return
 		}
+
+		err = graphics.DrawLine(
+			box.Position().Add(cursor.Mul(structure.NewVector2[int32](0, 1))),
+			box.Position().Add(cursor.Mul(structure.NewVector2[int32](0, 1))).Add(box.Size().Mul(structure.NewVector2[int32](1, 0))),
+			1.0,
+			rl.Red)
+		if err != nil {
+			return
+		}
+
+		err = graphics.DrawLine(
+			box.Position().Add(cursor.Mul(structure.NewVector2[int32](1, 0))),
+			box.Position().Add(cursor.Mul(structure.NewVector2[int32](1, 0))).Add(box.Size().Mul(structure.NewVector2[int32](0, 1))),
+			1.0,
+			rl.Red)
+		if err != nil {
+			return
+		}
+
+		rl.DrawText(fmt.Sprintf("%0.4f", controller.valueYline), rl.GetMouseX() + 8, rl.GetMouseY() + 8, 32.0, rl.RayWhite)
 	})
 	if err != nil {
 		return

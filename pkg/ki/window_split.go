@@ -16,6 +16,7 @@ type WindowSplit struct {
 	sizeAbs     structure.Vector2[int32]
 	axis        WindowSplitAxis
 	color       structure.Vector3[uint8]
+	cursor      structure.Vector2[int32]
 	selected    bool
 }
 
@@ -148,6 +149,16 @@ func (window *WindowSplit) BoxAbs() structure.Box[int32] {
 	return structure.NewBox[int32](
 		window.PositionAbsolute(),
 		window.SizeAbsolute())
+}
+
+func (window *WindowSplit) CursorPosition() structure.Vector2[int32] {
+	return window.cursor
+}
+
+func (window *WindowSplit) SetCursorPosition(value structure.Vector2[int32]) {
+	window.cursor = value
+
+	return
 }
 
 func (window *WindowSplit) Compute() (err error) {

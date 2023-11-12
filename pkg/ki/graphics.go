@@ -41,6 +41,8 @@ func (graphics *Graphics) Start() (err error) {
 		1024,
 		nil)
 
+	rl.SetTextureFilter(graphics.font.Texture, rl.FilterBilinear)
+
 	graphics.textureCursor = rl.LoadTexture("./data/image/texture_cursor.png")
 	graphics.textureWindow = rl.LoadTexture("./data/image/texture_window.png")
 
@@ -111,10 +113,23 @@ func (graphics *Graphics) DrawTextCentered(value string, box structure.Box[int32
 	return
 }
 
-func (graphics *Graphics) DrawGraph(value []float64, box structure.Box[int32]) (err error) {
-	points := make([]structure.Vector2[int32], 0)
+func (graphics *Graphics) DrawLine(a, b structure.Vector2[int32], thick float64, fill color.RGBA) (err error) {
+	rl.DrawLineEx(
+		a.ToRaylib(),
+		b.ToRaylib(),
+		float32(thick),
+		fill)
 
-	valueMin, valueMax := structure.MinMax[float64](value...)
+	return
+}
+
+func (graphics *Graphics) DrawGraph(
+	value []float64,
+	valueMin float64,
+	valueMax float64,
+	box structure.Box[int32],
+) (err error) {
+	points := make([]structure.Vector2[int32], 0)
 
 	for i, v := range value {
 		pointX := float64(i) / float64(len(value)) * box.Size().ToFloat64().X()
@@ -124,17 +139,14 @@ func (graphics *Graphics) DrawGraph(value []float64, box structure.Box[int32]) (
 	}
 
 	for _, point := range points {
-		rl.DrawLineEx(
-			box.Position().Add(point.Mul(structure.NewVector2[int32](1, 0))).Add(box.Size().Mul(structure.NewVector2[int32](0, 1))).ToRaylib(),
-			box.Position().Add(point.Mul(structure.NewVector2[int32](1, 1))).ToRaylib(),
+		err = graphics.DrawLine(
+			box.Position().Add(point.Mul(structure.NewVector2[int32](1, 0))).Add(box.Size().Mul(structure.NewVector2[int32](0, 1))),
+			box.Position().Add(point.Mul(structure.NewVector2[int32](1, 1))),
 			2.0,
 			rl.RayWhite)
-
-		//		rl.DrawCircle(
-		//			box.Position().X()+point.X(),
-		//			box.Position().Y()+point.Y(),
-		//			2.0,
-		//			rl.RayWhite)
+		if err != nil {
+			return
+		}
 	}
 
 	return

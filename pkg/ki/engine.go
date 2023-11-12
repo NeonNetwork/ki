@@ -149,6 +149,11 @@ func (engine *Engine) Start() (err error) {
 			return
 		}
 
+		err = engine.HandleCursor()
+		if err != nil {
+			return
+		}
+
 		err = engine.Compute()
 		if err != nil {
 			return
