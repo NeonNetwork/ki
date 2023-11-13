@@ -2,6 +2,7 @@ package ki
 
 import (
 	"github.com/heartbytenet/bblib/objects"
+	"golang.org/x/exp/rand"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/google/uuid"
@@ -134,13 +135,26 @@ func (window *WindowImage) SetSplitAxis(value WindowSplitAxis) {
 }
 
 var (
-	I = 0
-	W = []string{"N", "G", "P", "L"}
+	I = -1
+	W = []string{"N", "G", "L", "P"}
 )
+
+func generatePastelColor(base structure.Vector3[byte], factor float64) structure.Vector3[byte] {
+	// Ensure the factor is between 0 and 1
+	if factor < 0 {
+		factor = 0
+	} else if factor > 1 {
+		factor = 1
+	}
+
+	return base.ToFloat64().
+		Add(structure.NewVector3[float64](255, 255, 255).Sub(base.ToFloat64()).Mul(structure.NewVector3[float64](factor, factor, factor))).
+		ToUint8()
+}
 
 func (window *WindowImage) Init() *WindowImage {
 	window.id = uuid.New()
-	window.color = structure.NewVector3Random[byte](256)
+	window.color = generatePastelColor(structure.NewVector3Random[byte](255), rand.Float64() * 0.5)
 
 	I++
 	switch W[I%len(W)] {
