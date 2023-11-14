@@ -15,6 +15,7 @@ var (
 type Graphics struct {
 	engine *Engine
 
+	icon *rl.Image
 	font rl.Font
 
 	textureCursor rl.Texture2D
@@ -42,6 +43,9 @@ func (graphics *Graphics) Start() (err error) {
 		nil)
 
 	rl.SetTextureFilter(graphics.font.Texture, rl.FilterBilinear)
+
+	graphics.icon = rl.LoadImage("./data/image/icon.png")
+	rl.SetWindowIcon(*graphics.icon)
 
 	graphics.textureCursor = rl.LoadTexture("./data/image/texture_cursor.png")
 	graphics.textureWindow = rl.LoadTexture("./data/image/texture_window.png")
