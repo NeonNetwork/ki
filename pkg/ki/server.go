@@ -103,43 +103,54 @@ func (server *Server) HandleDataPull(cmd *proto.ExecuteCommand, res *proto.Execu
 				return
 			}
 
-			transform := func(data []any) ([]any, error) { // Todo: this is ugly
-				r := make([]any, 0)
+			process := func(src []any) (dst []any, err error) {
+				dst = make([]any, 0)
 
-				for _, v := range data {
-					vv := v.([]any)
-					a, e := strconv.ParseFloat(vv[0].(string), 64)
-					if e != nil {
-						return nil, e
+				for i, v := range src {
+					a := v.([]any)
+					s := make([]string, len(a))
+					d := make([]float64, len(a))
+
+					s[0] = a[0].(string)
+					s[1] = a[1].(string)
+
+					d[0], err = strconv.ParseFloat(s[0], 64)
+					if err != nil {
+						return
 					}
 
-					b, e := strconv.ParseFloat(vv[1].(string), 64)
-					if e != nil {
-						return nil, e
+					d[1], err = strconv.ParseFloat(s[1], 64)
+					if err != nil {
+						return
 					}
 
-					r = append(r, []float64{a, b})
+					dst = append(dst, d)
+
+					_ = i
 				}
 
-				return r, nil
-			}
-
-			bids, e := transform(result["bids"].([]any))
-			if e != nil {
-				err = e
 				return
 			}
 
-			asks, e := transform(result["asks"].([]any))
-			if e != nil {
-				err = e
+			var (
+				asks any
+				bids any
+			)
+
+			asks, err = process(result["asks"].([]any))
+			if err != nil {
+				return
+			}
+
+			bids, err = process(result["bids"].([]any))
+			if err != nil {
 				return
 			}
 
 			result = map[string]any{
 				"value": map[string]any{
-					"bids": bids,
 					"asks": asks,
+					"bids": bids,
 				},
 			}
 		}

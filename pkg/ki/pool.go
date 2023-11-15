@@ -95,6 +95,95 @@ func (pool *Pool) Init() *Pool {
 			1000))
 
 	PoolRegister(
+		"BINANCE_LIST",
+		structure.NewCached[[]string](
+			make([]string, 0),
+			func(previous []string) (result []string, err error) {
+				var (
+					value     map[string]any
+					valueAsks [][]float64
+					valueBids [][]float64
+					data      any
+					flag      bool
+				)
+
+				result = make([]string, 0)
+
+				ENGINE.Apply(func(engine *Engine) {
+					data, err = engine.Logic().RpcDataPull("BINANCE_ORDERS")
+					if err != nil {
+						return
+					}
+				})
+				if err != nil {
+					return
+				}
+
+				value, flag = data.(map[string]any)
+				if !flag {
+					err = fmt.Errorf(
+						"failed at converting %v -> %v",
+						reflect.TypeOf(data),
+						reflect.TypeOf(value))
+					return
+				}
+
+				for i, v := range value["asks"].([]any) {
+					a := v.([]any)
+					t := make([]float64, len(a))
+
+					for aI, aV := range a {
+						t[aI], flag = aV.(float64)
+						if !flag {
+							err = fmt.Errorf(
+								"failed at converting ask %v -> %v",
+								reflect.TypeOf(aV),
+								reflect.TypeOf(t[aI]))
+							return
+						}
+					}
+
+					valueAsks = append(valueAsks, t)
+					_ = i
+				}
+
+				for i, v := range value["bids"].([]any) {
+					a := v.([]any)
+					t := make([]float64, len(a))
+
+					for aI, aV := range a {
+						t[aI], flag = aV.(float64)
+						if !flag {
+							err = fmt.Errorf(
+								"failed at converting bid %v -> %v",
+								reflect.TypeOf(aV),
+								reflect.TypeOf(t[aI]))
+							return
+						}
+					}
+
+					valueBids = append(valueBids, t)
+					_ = i
+				}
+
+				for _, v := range valueAsks {
+					result = append(result, fmt.Sprintf("ASK -> %v @ %v",
+						v[0],
+						v[1]))
+				}
+
+				for _, v := range valueAsks {
+					result = append(result, fmt.Sprintf("BID -> %v @ %v",
+						v[0],
+						v[1]))
+				}
+
+				return
+			},
+			1000,
+		))
+
+	PoolRegister(
 		"RESOURCE_CPU",
 		structure.NewCached[float64](
 			0.0,

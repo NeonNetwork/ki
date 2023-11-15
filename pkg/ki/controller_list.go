@@ -3,11 +3,13 @@ package ki
 import (
 	"github.com/heartbytenet/bblib/containers/optionals"
 	"github.com/neonnetwork/ki/pkg/structure"
+	"os"
 )
 
 type ControllerList struct {
 	value []string
 
+	textSize  int32
 	textColor optionals.Optional[structure.Vector3[uint8]]
 
 	ControllerBase
@@ -32,17 +34,26 @@ func (controller *ControllerList) AddValue(value string) {
 func (controller *ControllerList) Init() *ControllerList {
 	controller.ControllerBase.Init()
 
+	controller.textSize = 16
 	controller.textColor = optionals.None[structure.Vector3[uint8]]()
 
 	return controller
 }
 
 func (controller *ControllerList) Compute() (err error) {
-	PoolGet[[]string]("TEXT_LIST_DATA").IfPresent(func(cache *structure.Cached[[]string]) {
-		value := cache.GetMust()
+	if os.Getenv("KI_SETUP") == "BINANCE" {
+		PoolGet[[]string]("BINANCE_LIST").IfPresent(func(cache *structure.Cached[[]string]) {
+			value := cache.GetMust()
 
-		controller.SetValue(value)
-	})
+			controller.SetValue(value)
+		})
+	} else {
+		PoolGet[[]string]("RESOURCE_LIST").IfPresent(func(cache *structure.Cached[[]string]) {
+			value := cache.GetMust()
+
+			controller.SetValue(value)
+		})
+	}
 
 	if controller.textColor.IsEmpty() {
 		controller.textColor = optionals.Some[structure.Vector3[uint8]](
@@ -63,7 +74,7 @@ func (controller *ControllerList) Render() (err error) {
 	colorY := controller.textColor.GetDefault(structure.NewVector3[uint8](0, 0, 0)).ToColor()
 	colorY.A = 32
 
-	textSize := int32(32)
+	textSize := controller.textSize
 	textLen := box.H() / textSize
 
 	textData := controller.Value()
@@ -91,7 +102,7 @@ func (controller *ControllerList) Render() (err error) {
 
 		for index, value := range textData {
 			vPos := vEnd.Sub(delta)
-			vSize := structure.NewVector2[int32](box.W(), 32)
+			vSize := structure.NewVector2[int32](box.W(), textSize)
 
 			textBoxColor := colorX
 			if (index % 2) == 0 {
@@ -108,12 +119,12 @@ func (controller *ControllerList) Render() (err error) {
 			err = graphics.DrawText(
 				textData[len(textData)-1-index],
 				vPos,
-				32.0)
+				float64(textSize))
 			if err != nil {
 				return
 			}
 
-			delta = delta.Add(structure.NewVector2[int32](0, 32))
+			delta = delta.Add(structure.NewVector2[int32](0, textSize))
 
 			_, _ = index, value
 		}

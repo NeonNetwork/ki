@@ -154,7 +154,7 @@ func generatePastelColor(base structure.Vector3[byte], factor float64) structure
 
 func (window *WindowImage) Init() *WindowImage {
 	window.id = uuid.New()
-	window.color = generatePastelColor(structure.NewVector3Random[byte](255), rand.Float64() * 0.5)
+	window.color = generatePastelColor(structure.NewVector3Random[byte](255), rand.Float64()*0.5)
 
 	I++
 	switch W[I%len(W)] {
