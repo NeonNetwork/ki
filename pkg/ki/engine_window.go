@@ -8,6 +8,8 @@ import (
 	"github.com/neonnetwork/ki/pkg/structure"
 )
 
+// WindowSplitCommon handles the splitting of windows
+// this returns the box values for the current and newly created window
 func (engine *Engine) WindowSplitCommon(window Window, direction structure.BinaryTreeDirection) (result structure.Pair[structure.Box[int32], structure.Box[int32]]) {
 	var (
 		axis WindowSplitAxis

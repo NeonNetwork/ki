@@ -315,6 +315,9 @@ func (pool *Pool) Get(key string) (result any) {
 	return pool.data[key]
 }
 
+// Todo: remove this when Go supports generic struct methods
+// This had to be done in order to get generic Cached[T] from *Pool
+
 func PoolRegister[T any](key string, value *structure.Cached[T]) {
 	POOL.Apply(func(pool *Pool) {
 		pool.Register(key, value)

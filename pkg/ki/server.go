@@ -103,6 +103,7 @@ func (server *Server) HandleDataPull(cmd *proto.ExecuteCommand, res *proto.Execu
 				return
 			}
 
+			// Go from [][]string -> [][]float64
 			process := func(src []any) (dst []any, err error) {
 				dst = make([]any, 0)
 

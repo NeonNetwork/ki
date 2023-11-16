@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+// Cached is a generic struct used to keep track of data that evolves with time
+// Cached.supply is called under a goroutine each time Cached.value has expired
 type Cached[T any] struct {
 	value  *sync.Mutex[T]
 	supply func(T) (T, error)

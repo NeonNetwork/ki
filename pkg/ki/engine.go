@@ -117,11 +117,12 @@ func (engine *Engine) Init() *Engine {
 	return engine
 }
 
+// Start the Ki dashboard engine
 func (engine *Engine) Start() (err error) {
-	rl.SetConfigFlags(rl.FlagWindowResizable)
-	rl.SetConfigFlags(rl.FlagMsaa4xHint)
-	rl.SetConfigFlags(rl.FlagWindowAlwaysRun)
-	rl.SetConfigFlags(rl.FlagWindowHighdpi)
+	rl.SetConfigFlags(rl.FlagWindowResizable) // Make window resizable
+	rl.SetConfigFlags(rl.FlagMsaa4xHint)      // Anti-aliasing
+	rl.SetConfigFlags(rl.FlagWindowAlwaysRun) // Keep running when minimized
+	rl.SetConfigFlags(rl.FlagWindowHighdpi)   // This might be useful on retina displays
 
 	if os.Getenv("VSYNC") != "" {
 		rl.SetConfigFlags(rl.FlagVsyncHint)
@@ -145,21 +146,25 @@ func (engine *Engine) Start() (err error) {
 	}
 
 	for engine.Running() {
+		// Handle keyboard inputs
 		err = engine.HandleInputs()
 		if err != nil {
 			return
 		}
 
+		// Handle cursor movement
 		err = engine.HandleCursor()
 		if err != nil {
 			return
 		}
 
+		// Update windows and controllers data
 		err = engine.Compute()
 		if err != nil {
 			return
 		}
 
+		// Render windows with their controller
 		err = engine.Render()
 		if err != nil {
 			return
@@ -183,12 +188,14 @@ func (engine *Engine) Running() bool {
 	return !rl.WindowShouldClose()
 }
 
+// Screen render size vector
 func (engine *Engine) Screen() structure.Vector2[int32] {
 	return structure.NewVector2[int32](
 		int32(rl.GetRenderWidth()),
 		int32(rl.GetRenderHeight()))
 }
 
+// Cursor position vector
 func (engine *Engine) Cursor() structure.Vector2[int32] {
 	return structure.NewVector2[int32](
 		rl.GetMouseX(),
