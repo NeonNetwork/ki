@@ -99,11 +99,11 @@ func (controller *ControllerList) Render() (err error) {
 	}
 
 	GRAPHICS.Apply(func(graphics *Graphics) {
-		vEnd := box.Position().Add(box.Size().Mul(structure.NewVector2[int32](0, 1)))
+		vBase := box.Position()
 		delta := structure.NewVector2[int32](0, 0)
 
 		for index, value := range textData {
-			vPos := vEnd.Sub(delta)
+			vPos := vBase.Add(delta)
 			vSize := structure.NewVector2[int32](box.W(), textSize)
 
 			textBoxColor := colorX
