@@ -34,7 +34,7 @@ func (controller *ControllerList) AddValue(value string) {
 func (controller *ControllerList) Init() *ControllerList {
 	controller.ControllerBase.Init()
 
-	controller.textSize = 16
+	controller.textSize = 48
 	controller.textColor = optionals.None[structure.Vector3[uint8]]()
 
 	return controller

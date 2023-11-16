@@ -5,6 +5,7 @@ import (
 	"github.com/heartbytenet/bblib/containers/optionals"
 	"github.com/heartbytenet/bblib/containers/sync"
 	"github.com/neonnetwork/ki/pkg/structure"
+	"golang.org/x/exp/slices"
 	"log"
 	"reflect"
 	"sort"
@@ -92,7 +93,38 @@ func (pool *Pool) Init() *Pool {
 
 				return
 			},
-			100))
+			1000))
+
+	PoolRegister(
+		"RESOURCE_LIST",
+		structure.NewCached[[]string](
+			make([]string, 0),
+			func(previous []string) (result []string, err error) {
+				var (
+					data any
+				)
+
+				ENGINE.Apply(func(engine *Engine) {
+					data, err = engine.Logic().RpcDataPull("RESOURCE_LIST")
+					if err != nil {
+						return
+					}
+				})
+				if err != nil {
+					return
+				}
+
+				result = make([]string, 0)
+
+				for _, v := range data.([]any) {
+					result = append(result, v.(string))
+				}
+
+				slices.Reverse(result)
+
+				return
+			},
+			1000))
 
 	PoolRegister(
 		"BINANCE_LIST",

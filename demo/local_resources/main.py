@@ -23,10 +23,11 @@ async def process(cmd):
         case 'RESOURCE_CPU':
             return psutil.cpu_percent()
         case 'RESOURCE_TOP':
-            return await list_process()
+            return await list_process(True)
+        case 'RESOURCE_LIST':
+            return await list_process(False)
 
-async def list_process():
-    result = {}
+async def list_process(alt: bool):
     data = []
     
     for process in psutil.process_iter(['pid', 'name', 'username', 'cpu_percent', 'memory_percent']):
@@ -47,14 +48,24 @@ async def list_process():
         
         data.append(value)
     
-    data = sorted(data, key=lambda v: v['cpu_percent'], reverse=True)
-    while len(data) > 10:
+    data = list(sorted(data, key=lambda v: v['cpu_percent'], reverse=True))
+    while len(data) > 100:
         data = data[:-1]
-        
-    for value in data:
-        result[value['name']] = value['cpu_percent']
-        
-    return result
+
+    if alt:
+        result = {}
+
+        for value in data:
+            result[value['name']] = value['cpu_percent']
+
+        return result
+    else:
+        result = []
+
+        for value in data:
+            result.append('%s -> %s%%' % (value['name'], value['cpu_percent']))
+
+        return result
     
 def main():
     APP.run(
