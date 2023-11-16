@@ -1,5 +1,9 @@
 # Ki - Native Dynamic Dashboard
 
+# About
+
+<img src="https://raw.githubusercontent.com/NeonNetwork/ki/main/data/screenshots/demo_resource.png">
+
 ## What is this?
 
 This is a natively compiled, hardware accelerated dashboard built in [Go](https://go.dev/)
