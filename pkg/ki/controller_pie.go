@@ -43,7 +43,7 @@ func (controller *ControllerPie) Compute() (err error) {
 }
 
 func (controller *ControllerPie) Render() (err error) {
-	box := controller.Window().BoxAbs()
+	box := controller.Window().BoxRender()
 	pos := box.Position()
 
 	value := controller.Value()

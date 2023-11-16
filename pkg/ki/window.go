@@ -37,6 +37,8 @@ type Window interface {
 	SetSize(vector structure.Vector2[int32])
 	SizeAbsolute() structure.Vector2[int32]
 	SetSizeAbsolute(structure.Vector2[int32])
+	Gaps() int32
+	SetGaps(int32)
 	SplitAxis() WindowSplitAxis
 	SetSplitAxis(axis WindowSplitAxis)
 	Selected() bool
@@ -46,6 +48,7 @@ type Window interface {
 
 	Box() structure.Box[int32]
 	BoxAbs() structure.Box[int32]
+	BoxRender() structure.Box[int32]
 
 	CursorPosition() structure.Vector2[int32]
 	SetCursorPosition(structure.Vector2[int32])

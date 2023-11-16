@@ -49,7 +49,7 @@ func (controller *ControllerNumber[T]) Render() (err error) {
 	GRAPHICS.Apply(func(graphics *Graphics) {
 		err = graphics.DrawTextCentered(
 			fmt.Sprintf("%v", controller.Value()),
-			controller.Window().BoxAbs())
+			controller.Window().BoxRender())
 		if err != nil {
 			return
 		}

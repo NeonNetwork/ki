@@ -33,6 +33,7 @@ func (engine *Engine) ComputeWindowsStep(node *structure.BinaryTreeNode[Window])
 
 	window.SetSelected(engine.selected == node)
 	window.SetIsRoot(engine.windows == node)
+	window.SetGaps(EngineWindowGaps)
 
 	if window.IsRoot() {
 		window.SetPositionAbsolute(structure.NewVector2[int32](0, 0))

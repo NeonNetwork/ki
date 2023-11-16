@@ -76,7 +76,7 @@ func (controller *ControllerGraph) Compute() (err error) {
 		}
 	}
 
-	for int32(len(value)) > (controller.Window().BoxAbs().W() / 8) {
+	for int32(len(value)) > (controller.Window().BoxRender().W() / 8) {
 		value = value[1:]
 	}
 
@@ -87,7 +87,7 @@ func (controller *ControllerGraph) Compute() (err error) {
 	// Compute mouse
 	cursor := controller.Window().CursorPosition()
 
-	cursorY := controller.Window().BoxAbs().H() - cursor.Y()
+	cursorY := controller.Window().BoxRender().H() - cursor.Y()
 
 	controller.valueYline = controller.valueYmin + (controller.valueYmax-controller.valueYmin)*(float64(cursorY)/float64(controller.Window().BoxAbs().H()))
 
@@ -95,7 +95,7 @@ func (controller *ControllerGraph) Compute() (err error) {
 }
 
 func (controller *ControllerGraph) Render() (err error) {
-	box := controller.Window().BoxAbs()
+	box := controller.Window().BoxRender()
 	cursor := controller.Window().CursorPosition()
 
 	GRAPHICS.Apply(func(graphics *Graphics) {
@@ -103,7 +103,7 @@ func (controller *ControllerGraph) Render() (err error) {
 			controller.Value(),
 			controller.valueYmin,
 			controller.valueYmax,
-			controller.Window().BoxAbs())
+			controller.Window().BoxRender())
 		if err != nil {
 			return
 		}

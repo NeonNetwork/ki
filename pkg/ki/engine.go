@@ -17,6 +17,7 @@ import (
 
 const (
 	EngineWindowUnit = 1048576
+	EngineWindowGaps = 16
 )
 
 func init() {

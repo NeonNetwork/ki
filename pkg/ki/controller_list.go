@@ -67,7 +67,7 @@ func (controller *ControllerList) Compute() (err error) {
 }
 
 func (controller *ControllerList) Render() (err error) {
-	box := controller.Window().BoxAbs()
+	box := controller.Window().BoxRender()
 
 	colorX := controller.Window().Color().ToColor()
 	colorX.A = 32
@@ -79,7 +79,9 @@ func (controller *ControllerList) Render() (err error) {
 
 	textData := controller.Value()
 	for len(controller.Value()) > int(textLen) {
-		controller.SetValue(textData[1:])
+		if len(controller.Value()) > 0 {
+			controller.SetValue(textData[1:])
+		}
 		textData = controller.Value()
 	}
 

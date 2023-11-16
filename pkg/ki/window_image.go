@@ -22,6 +22,7 @@ type WindowImage struct {
 	selected    bool
 	color       structure.Vector3[uint8]
 	cursor      structure.Vector2[int32]
+	gaps        int32
 
 	controller Controller
 }
@@ -84,6 +85,16 @@ func (window *WindowImage) SetPositionAbsolute(value structure.Vector2[int32]) {
 	return
 }
 
+func (window *WindowImage) Gaps() int32 {
+	return window.gaps
+}
+
+func (window *WindowImage) SetGaps(value int32) {
+	window.gaps = value
+
+	return
+}
+
 func (window *WindowImage) Size() structure.Vector2[int32] {
 	return window.size
 }
@@ -136,7 +147,7 @@ func (window *WindowImage) SetSplitAxis(value WindowSplitAxis) {
 
 var (
 	I = -1
-	W = []string{"N", "G", "L", "P"}
+	W = []string{"G", "N", "L", "P"}
 )
 
 func generatePastelColor(base structure.Vector3[byte], factor float64) structure.Vector3[byte] {
@@ -193,6 +204,16 @@ func (window *WindowImage) BoxAbs() structure.Box[int32] {
 	return structure.NewBox[int32](
 		window.PositionAbsolute(),
 		window.SizeAbsolute())
+}
+
+func (window *WindowImage) BoxRender() structure.Box[int32] {
+	gaps := window.Gaps()
+
+	result := structure.NewBox[int32](
+		window.PositionAbsolute().Add(structure.NewVector2[int32](gaps, gaps)),
+		window.SizeAbsolute().Sub(structure.NewVector2[int32](gaps*2, gaps*2)))
+
+	return result
 }
 
 func (window *WindowImage) CursorPosition() structure.Vector2[int32] {

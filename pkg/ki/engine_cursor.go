@@ -3,7 +3,7 @@ package ki
 import "github.com/neonnetwork/ki/pkg/structure"
 
 func (engine *Engine) HandleCursor() (err error) {
-	cursor := engine.Cursor()
+	cursor := engine.Cursor().Sub(structure.NewVector2[int32](EngineWindowGaps, EngineWindowGaps))
 
 	err = engine.WindowListWalkNode(func(node *structure.BinaryTreeNode[Window]) error {
 		window := node.Value()

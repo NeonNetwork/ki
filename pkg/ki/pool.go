@@ -92,7 +92,7 @@ func (pool *Pool) Init() *Pool {
 
 				return
 			},
-			1000))
+			100))
 
 	PoolRegister(
 		"BINANCE_LIST",

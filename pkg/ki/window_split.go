@@ -18,6 +18,7 @@ type WindowSplit struct {
 	color       structure.Vector3[uint8]
 	cursor      structure.Vector2[int32]
 	selected    bool
+	gaps        int32
 }
 
 func (window *WindowSplit) Id() uuid.UUID {
@@ -78,6 +79,16 @@ func (window *WindowSplit) SetPositionAbsolute(value structure.Vector2[int32]) {
 	return
 }
 
+func (window *WindowSplit) Gaps() int32 {
+	return window.gaps
+}
+
+func (window *WindowSplit) SetGaps(value int32) {
+	window.gaps = value
+
+	return
+}
+
 func (window *WindowSplit) Color() structure.Vector3[uint8] {
 	return window.color
 }
@@ -130,6 +141,7 @@ func (window *WindowSplit) SetSplitAxis(value WindowSplitAxis) {
 
 func (window *WindowSplit) Init() *WindowSplit {
 	window.id = uuid.New()
+	window.gaps = 8
 
 	window.SetPosition(structure.NewVector2[int32](0, 0))
 	window.SetPositionAbsolute(window.Position())
@@ -149,6 +161,12 @@ func (window *WindowSplit) BoxAbs() structure.Box[int32] {
 	return structure.NewBox[int32](
 		window.PositionAbsolute(),
 		window.SizeAbsolute())
+}
+
+func (window *WindowSplit) BoxRender() structure.Box[int32] {
+	return structure.NewBox[int32](
+		window.PositionAbsolute().Add(structure.NewVector2[int32](8, 8)),
+		window.SizeAbsolute().Sub(structure.NewVector2[int32](8, 8)))
 }
 
 func (window *WindowSplit) CursorPosition() structure.Vector2[int32] {
